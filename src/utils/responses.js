@@ -23,10 +23,10 @@ const badRequest = (message, res = response) => {
     });
 };
 
-const internalServerError = (error, res = response) => {
+const internalServerError = (message, res = response) => {
     res.status(500).json({
         ok: false,
-        error
+        message
     });
 };
 
@@ -34,5 +34,5 @@ module.exports = {
     successResponse,
     createdSuccessful,
     badRequest,
-    internalServerError,
-}
+    internalServerError
+};

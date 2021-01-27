@@ -1,15 +1,13 @@
+
 /*
     Rutas de Usuarios / Auth
     host + /api/auth
 */
 const express = require('express');
-const rootrouter = express.Router();
-const {LoginUser} = require('../controllers/auth')
+const { LoginUser, register } = require('../controllers/auth');
+const router = express.Router();
 
-rootrouter.post('/login', LoginUser);
+router.post('/login', LoginUser);
+router.post('/register', register);
 
-rootrouter.get('*', (req, res) =>{
-    res.sendFile(path.join(__dirname + '/public/index.html'));
-});
-
-module.exports = rootrouter
+module.exports = router;

@@ -9,7 +9,7 @@ const dbConnection = async () => {
             useFindAndModify: false
         });
 
-        console.log('DB Online');
+        console.log('Successfully connected to the database');
     }catch(error){
         console.log(error);
         throw new Error('Error a la hora de inicializar la base de datos');
