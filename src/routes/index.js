@@ -1,15 +1,10 @@
 const express = require('express');
-const rootrouter = express.Router();
+const app = express();
 
-rootrouter.get('/', (req, res) =>{
-    res.json({
-        ok: true,
-        msg: 'Listoco',
-    });
-});
+app.use('/api/auth', require('./auth'));
 
-rootrouter.get('*', (req, res) =>{
+app.get('*', (req, res) =>{
     res.sendFile(path.join(__dirname + '/public/index.html'));
 });
 
-module.exports = rootrouter
+module.exports = app;
