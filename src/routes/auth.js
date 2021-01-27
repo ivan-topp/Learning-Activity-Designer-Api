@@ -1,12 +1,12 @@
+/*
+    Rutas de Usuarios / Auth
+    host + /api/auth
+*/
 const express = require('express');
 const rootrouter = express.Router();
+const {LoginUser} = require('../controllers/auth')
 
-rootrouter.get('/', (req, res) =>{
-    res.json({
-        ok: true,
-        msg: 'Listoco',
-    });
-});
+rootrouter.post('/login', LoginUser);
 
 rootrouter.get('*', (req, res) =>{
     res.sendFile(path.join(__dirname + '/public/index.html'));
