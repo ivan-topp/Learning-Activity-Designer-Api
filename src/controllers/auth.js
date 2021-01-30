@@ -1,10 +1,10 @@
-const {response} = require('express');
+const { response } = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const {successResponse, badRequest, internalServerError, createdSuccessful} = require('../utils/responses'); 
+const { successResponse, badRequest, internalServerError, createdSuccessful } = require('../utils/responses'); 
 const { generateJWT } = require('../utils/jwt');
 
-const LoginUser = async(req, res = response)=>{ 
+const login = async(req, res = response)=>{ 
     
     const {email, password} = req.body;
     if(!email){badRequest('El correo es requerido', res)}
@@ -22,8 +22,15 @@ const LoginUser = async(req, res = response)=>{
             return badRequest('password incorrecto', res);
         }
         
-        const token = await generateJWT(user.id, user.name);
-        return successResponse('Usuario Logeado', {user, token}, res)
+        const token = await generateJWT(user.id, user.name, user.lastname);
+        return successResponse('Usuario Logeado', {
+            user: {
+                uid: user.id,
+                name: user.name,
+                lastname: user.lastname,
+            }, 
+            token
+        }, res);
         
 
     } catch (error) {
@@ -47,16 +54,36 @@ const register = async (req, res = response) => {
         const salt = bcrypt.genSaltSync();
         user.password = bcrypt.hashSync(password, salt);
         await user.save();
-        const token = await generateJWT( user.id, user.name );
-        createdSuccessful('Usuario creado satisfactoriamente.', { user, token }, res);
+        const token = await generateJWT( user.id, user.name, user.lastname );
+        createdSuccessful('Usuario creado satisfactoriamente.', {
+            user: {
+                uid: user.id,
+                name: user.name,
+                lastname: user.lastname,
+            }, 
+            token
+        }, res);
     } catch (error) {
         console.log(error);
         internalServerError('Por favor hable con el administrador.', res);
     }
 };
 
+const renewToken = async (req, res = response) => {
+    const { uid, name, lastname } = req;
+    const token = await generateJWT(uid, name, lastname);
+    successResponse('Token renovado con éxito.', {
+        user: {
+            uid,
+            name,
+            lastname,
+        }, 
+        token
+    }, res);
+};
+
 module.exports = {
     register,
-    LoginUser
-
+    login,
+    renewToken
 };

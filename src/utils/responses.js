@@ -30,9 +30,17 @@ const internalServerError = (message, res = response) => {
     });
 };
 
+const unauthorized = (message, res = response) => {
+    res.status(401).json({
+        ok: false,
+        message
+    });
+};
+
 module.exports = {
     successResponse,
     createdSuccessful,
     badRequest,
-    internalServerError
+    internalServerError,
+    unauthorized
 };
