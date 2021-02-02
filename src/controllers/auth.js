@@ -5,23 +5,14 @@ const { successResponse, badRequest, internalServerError, createdSuccessful } = 
 const { generateJWT } = require('../utils/jwt');
 
 const login = async(req, res = response)=>{ 
-    
     const {email, password} = req.body;
-    if(!email){badRequest('El correo es requerido', res)}
-    if(!password){badRequest('La password es requerida', res)}
-    
+    if(!email) return badRequest('El correo es requerido.', res);
+    if(!password) return badRequest('La password es requerida.', res);
     try {
         const user = await User.findOne({email:email});
-    
-        if(!user){
-            return badRequest('El usuario no existe con ese email', res);
-        }
+        if(!user) return badRequest('Email o contraseña incorrecto.', res);
         const validPassword = bcrypt.compareSync(password, user.password);
-        
-        if(!validPassword){
-            return badRequest('password incorrecto', res);
-        }
-        
+        if(!validPassword) return badRequest('Email o contraseña incorrecto.', res);
         const token = await generateJWT(user.id, user.name, user.lastname);
         return successResponse('Usuario Logeado', {
             user: {
@@ -30,9 +21,7 @@ const login = async(req, res = response)=>{
                 lastname: user.lastname,
             }, 
             token
-        }, res);
-        
-
+        }, res);    
     } catch (error) {
         internalServerError('Porfavor hable con el administrador', res)
     }
@@ -64,7 +53,6 @@ const register = async (req, res = response) => {
             token
         }, res);
     } catch (error) {
-        console.log(error);
         internalServerError('Por favor hable con el administrador.', res);
     }
 };
