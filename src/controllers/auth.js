@@ -1,6 +1,7 @@
 const { response } = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const Folder = require('../models/Folder');
 const { successResponse, badRequest, internalServerError, createdSuccessful } = require('../utils/responses'); 
 const { generateJWT } = require('../utils/jwt');
 
@@ -21,7 +22,7 @@ const login = async(req, res = response)=>{
                 lastname: user.lastname,
             }, 
             token
-        }, res);    
+        }, res);
     } catch (error) {
         internalServerError('Porfavor hable con el administrador', res)
     }
@@ -43,6 +44,11 @@ const register = async (req, res = response) => {
         const salt = bcrypt.genSaltSync();
         user.password = bcrypt.hashSync(password, salt);
         await user.save();
+        const rootUserFolder = Folder({
+            owner: user.id,
+            path: '/',
+        });
+        await rootUserFolder.save();
         const token = await generateJWT( user.id, user.name, user.lastname );
         createdSuccessful('Usuario creado satisfactoriamente.', {
             user: {
