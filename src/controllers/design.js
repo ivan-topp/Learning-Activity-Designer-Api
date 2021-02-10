@@ -27,10 +27,11 @@ const getUserDesignsAndForldersByPath = async(req, res = response)=>{
     try {
         const folder = await Folder.findOne({ path, owner: uid });
         const folders = await Folder.find({ parent: folder.id, owner: uid });
-        const designs = await Design.find({ owner: uid })
+        const designs = await Design.find({ owner: uid, folder: folder.id })
             .skip(from || 0)
-            .limit(limit || 10)
+            .limit(limit || 12)
             .populate('metadata.category')
+            .populate('owner', 'name lastname')
             .populate('folder', 'owner path parent');
         return successResponse('Diseños obtenidos con éxito.', { folders, designs }, res);
     } catch (error) {
