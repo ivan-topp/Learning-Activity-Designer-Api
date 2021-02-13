@@ -23,32 +23,21 @@ const getRecentDesigns = async (req, res = response) => {
 
 const getUserDesignsAndFoldersByPath = async (req, res = response) => {
     const { uid } = req;
-    const { path, from, limit } = req.body;
+    let { path, from, limit } = req.body;
+    from = from || 0;
+    limit = limit || 12;
     if (!uid) return badRequest('No se ha especificado un usuario.', res);
     if (!path) return badRequest('No se ha especificado un carpeta.', res);
     try {
         const folder = await Folder.findOne({ path, owner: uid });
-        const folders = await Folder.find({ parent: folder.id, owner: uid });
-        let canFetchMore = false;
-        await Design.aggregate([
-            {
-                '$match': {
-                    "owner": { '$eq': mongoose.Types.ObjectId(uid) },
-                    "folder": { '$eq': mongoose.Types.ObjectId(folder.id) }
-                }
-            },
-            { '$count': "q" }
-        ], function (err, result) {
-            if( err ) return internalServerError('Porfavor hable con el administrador.', res);
-            if( result.length > 0 ) canFetchMore = result[0].q > (limit || 12);
-        });
+        const numOfDesigns = await Design.countDocuments({ owner: uid, folder: folder.id });
         const designs = await Design.find({ owner: uid, folder: folder.id })
-            .skip(from || 0)
-            .limit(limit || 12)
+            .skip(from)
+            .limit(limit)
             .populate('metadata.category')
             .populate('owner', 'name lastname')
             .populate('folder', 'owner path parent');
-        return successResponse('Diseños obtenidos con éxito.', { ownerId: uid, canFetchMore, folders, designs }, res);
+        return successResponse('Diseños obtenidos con éxito.', { ownerId: uid, from: from + limit, nPages : Math.ceil(numOfDesigns / limit),  designs }, res);
     } catch (error) {
         console.log(error);
         return internalServerError('Porfavor hable con el administrador.', res);
@@ -75,32 +64,22 @@ const deleteDesign = async (req, res = response) => {
 }
 
 const getPublicDesignsByUser = async (req, res = response) => {
-    const { id, from, limit } = req.body;
+    let { id, from, limit } = req.body;
+    from = from || 0;
+    limit = limit || 12;
     if (!id) return badRequest('No se ha especificado un usuario.', res);
     if (!mongoose.Types.ObjectId.isValid(id)) return badRequest('No existe usuario con la id especificada.', res);
     try {
         const user = User.findById(id);
         if (!user) return badRequest('No existe usuario con la id especificada.', res);
-        let canFetchMore = false;
-        await Design.aggregate([
-            {
-                '$match': {
-                    "owner": { '$eq': mongoose.Types.ObjectId(id) },
-                    "metadata.public": { '$eq': true }
-                }
-            },
-            { '$count': "q" }
-        ], function (err, result) {
-            if( err ) return internalServerError('Porfavor hable con el administrador.', res);
-            if( result.length > 0 ) canFetchMore = result[0].q > (limit || 12);
-        });
+        const numOfDesigns = await Design.countDocuments({ owner: id, 'metadata.public': true });
         const designs = await Design.find({ owner: id, 'metadata.public': true })
-            .skip(from || 0)
-            .limit(limit || 12)
+            .skip(from)
+            .limit(limit)
             .populate('metadata.category')
             .populate('owner', 'name lastname')
             .populate('folder', 'owner path parent');
-        return successResponse('Se han obtenido con éxito los diseños públicos del usuario especificado.', { ownerId: id, canFetchMore, designs }, res);
+        return successResponse('Se han obtenido con éxito los diseños públicos del usuario especificado.', { ownerId: id, from: from + limit, nPages : Math.ceil(numOfDesigns / limit), designs }, res);
     } catch (error) {
         console.log(error);
         return internalServerError('Porfavor hable con el administrador.', res);
