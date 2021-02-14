@@ -3,11 +3,11 @@
     host + /api/user
 */
 const express = require('express');
-const { getUserProfile, searchOtherUserProfile } = require('../controllers/user');
+const { getUser, searchUsers } = require('../controllers/user');
 const { validateJWT } = require('../middlewares/validateJWT');
 const router = express.Router();
 
-router.get('/:uid', validateJWT, getUserProfile);
-router.post('/user', validateJWT, searchOtherUserProfile);
+router.get('/:uid', validateJWT, getUser);
+router.post('/search/:filter', validateJWT, searchUsers);
 
 module.exports = router;

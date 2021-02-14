@@ -16,6 +16,14 @@ const UserSchema = Schema({
     updatedOn: { type: Date, required: true },
 });
 
+UserSchema.index({
+    name: 'text',
+    lastname: 'text',
+    email: 'text',
+    city: 'text',
+    country: 'text',
+});
+
 UserSchema.methods.toJSON = function () {
     const doc = this;
     const obj = doc.toObject();
