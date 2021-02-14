@@ -16,8 +16,7 @@ const getUser = async(req, res = response)=>{
     }
 }
 const searchUsers = async(req, res = response)=>{
-    const { filter } = req.params;
-    let { from, limit } = req.body;
+    let { filter, from, limit } = req.body;
     from = from || 0;
     limit = limit || 30;
     try {

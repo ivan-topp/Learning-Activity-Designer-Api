@@ -8,6 +8,6 @@ const { validateJWT } = require('../middlewares/validateJWT');
 const router = express.Router();
 
 router.get('/:uid', validateJWT, getUser);
-router.post('/search/:filter', validateJWT, searchUsers);
+router.post('/search', validateJWT, searchUsers);
 
 module.exports = router;
