@@ -21,13 +21,14 @@ const login = async(req, res = response)=>{
                 name: user.name,
                 lastname: user.lastname,
                 occupation: user.occupation,
+                contacts: user.contacts,
             }, 
             token
         }, res);
     } catch (error) {
         internalServerError('Porfavor hable con el administrador', res)
     }
-}
+};
 
 const register = async (req, res = response) => {
     const { name, lastname, email, password } = req.body;
@@ -57,6 +58,7 @@ const register = async (req, res = response) => {
                 name: user.name,
                 lastname: user.lastname,
                 occupation: user.occupation,
+                contacts: user.contacts,
             }, 
             token
         }, res);
@@ -68,14 +70,21 @@ const register = async (req, res = response) => {
 const renewToken = async (req, res = response) => {
     const { uid, name, lastname } = req;
     const token = await generateJWT(uid, name, lastname);
-    successResponse('Token renovado con éxito.', {
-        user: {
-            uid,
-            name,
-            lastname,
-        }, 
-        token
-    }, res);
+    try {
+        const user = await User.findById(uid);
+        if(!user) return badRequest('No existe usuario con la id especificada', res);
+        successResponse('Token renovado con éxito.', {
+            user: {
+                uid,
+                name,
+                lastname,
+                contacts: user.contacts
+            }, 
+            token
+        }, res);
+    } catch (error) {
+        internalServerError('Por favor hable con el administrador.', res);
+    }
 };
 
 module.exports = {
