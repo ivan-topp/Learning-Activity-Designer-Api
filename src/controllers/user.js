@@ -18,14 +18,14 @@ const getUser = async(req, res = response)=>{
 const searchUsers = async(req, res = response)=>{
     let { filter, from, limit } = req.body;
     from = from || 0;
-    limit = limit || 30;
+    limit = limit || 12;
     try {
         if(!filter) return badRequest('Filtro de usuarios no especificado.', res);
         const numOfUsers = await User.countDocuments({ $text: { $search: filter } });
         const users = await User.find({ $text: { $search: filter } })
             .skip(from)
             .limit(limit);
-        return successResponse('Usuarios obtenidos correctamente.', { users, nPages: Math.ceil(numOfUsers / limit)}, res);
+        return successResponse('Usuarios obtenidos correctamente.', { users, from: from + limit, nPages: Math.ceil(numOfUsers / limit)}, res);
     } catch (error) {
         console.log(error);
         return internalServerError('Porfavor hable con el administrador.', res);
