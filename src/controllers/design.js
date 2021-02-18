@@ -1,5 +1,4 @@
 const { response } = require('express');
-const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Folder = require('../models/Folder');
 const Design = require('../models/Design');
