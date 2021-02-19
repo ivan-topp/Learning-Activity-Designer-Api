@@ -19,7 +19,7 @@ const socketsConfig = ( io ) => {
                 }
             });
         });
-
+        // TODO: Verify that the user is editor of the design.
         socket.on('join-to-design', async ({ user, designId }, callback) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let resp = { ok: false, message: 'Error al intentar ingresar a la sala.'};
