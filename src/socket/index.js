@@ -15,31 +15,34 @@ const socketsConfig = ( io ) => {
                 if(socket.id !== room){
                     const designRoom = designRooms.getDesignRoomById(room);
                     designRoom.removeUser( socket.id );
-                    io.to(room).emit('joined', designRoom.getUsers());
+                    io.to(room).emit('users', designRoom.getUsers());
                 }
             });
         });
 
-        socket.on('join-to-design', async ({ user, designId }) => {
+        socket.on('join-to-design', async ({ user, designId }, callback) => {
             let designRoom = designRooms.getDesignRoomById( designId );
+            let resp = { ok: false, message: 'Error al intentar ingresar a la sala.'};
             if( !designRoom ) {
                 designRoom = await designRooms.addDesignRoom( designId );
                 if( designRoom ) {
                     socket.join( designId );
-                    return io.to(designId).emit('joined', designRoom.addUser( {...user, socketId: socket.id} ));
+                    resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
+                    io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
                 }
             }else{
                 socket.join( designId );
-                return io.to(designId).emit('joined', designRoom.addUser( {...user, socketId: socket.id} ));
+                resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
+                io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
             }
-            return io.to(socket.id).emit('not-joined', { ok: false, message: 'Error al intentar ingresar a la sala.'});
+            return callback(resp);
         });
 
         socket.on('leave-from-design', ({ user, designId }) => {
             socket.leave( designId );
             let designRoom = designRooms.getDesignRoomById( designId );
             designRoom.removeUser( socket.id );
-            return io.to(designId).emit('joined', designRoom.users);
+            return io.to(designId).emit('users', designRoom.users);
         });
     });
 };
