@@ -25,6 +25,10 @@ class DesignRoom {
         return removedUser;
     }
 
+    editDesign(newDesign) {
+        this.design = newDesign;
+    }
+
 }
 
 module.exports = {
