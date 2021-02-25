@@ -19,6 +19,7 @@ const DesignSchema = Schema({
         description: { type: String },
         objetive: { type: String },
         public: { type: Boolean, required: true },
+        isPublic: { type: Boolean, required: true },
         scoreMean: { type: Number, required: true },
         results: { type: [{
             verb: { type: String, required: true },
