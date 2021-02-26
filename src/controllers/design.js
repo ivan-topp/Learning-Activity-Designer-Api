@@ -121,7 +121,9 @@ const createDesign = async (req, res = response) => {
                 results: [],
                 classSize: 0,
             },
-            data: [],
+            data: {
+                tlas: []
+            },
             comments: [],
             assessments: [],
             owner: uid,
