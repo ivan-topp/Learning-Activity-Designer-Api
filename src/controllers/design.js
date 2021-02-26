@@ -85,10 +85,51 @@ const getPublicDesignsByUser = async (req, res = response) => {
     }
 };
 
+const updateTLADesing = async( req, res = response ) => {
+    const { uid } = req;
+    const id = req.params.id;
+    const { title, description } =  req.body;
+    console.log(title)
+    if (!id) return badRequest('No se ha especificado un diseño.', res);
+    try {
+        let design = await Design.findById( id );
+        console.log(design.owner)
+        if (design.owner.toString() !== uid) return unauthorized('Usted no está autorizado para editar este diseño.', res);
+        design = await Design.findByIdAndUpdate(id, title, { rawResult: true });
+        return successResponse('TLA del diseño editado', id, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
+};
+
+const addNewTLA = async(req, res = response) =>{
+    const { uid } = req;
+    const id = req.params.id;
+    const newTLA = {
+        title: 'Nuevo TLA 1',
+        description: 'Nueva Descripción 1',
+    };
+    try {
+        const design = await Design.findById( id );
+        if(!design) return badRequest('El Diseño no existe', res);
+        if (design.owner.toString() !== uid) return unauthorized('Usted no está autorizado para editar este diseño.', res);
+        let tlas = [...design.data.tlas];
+        tlas = [...design.data.tlas, newTLA];
+        await Design.findByIdAndUpdate( id, { data:{tlas:tlas} }, { rawResult:true });
+        return successResponse('TLA agregado.', newTLA, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
+};
 module.exports = {
     getRecentDesigns,
     getUserDesignsAndFoldersByPath,
     getDesignsSharedWithUser,
     deleteDesign,
     getPublicDesignsByUser,
+    updateTLADesing,
+    addNewTLA
+
 };
