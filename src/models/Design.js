@@ -1,5 +1,12 @@
 const { Schema, model } = require('mongoose');
 
+const PrivilegeSchema = Schema({
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    type: { type: Number, required: true },
+}, {
+    _id : false,
+});
+
 const DesignSchema = Schema({
     folder: { type: Schema.Types.ObjectId, ref: 'Folder' },
     metadata: { type: { 
@@ -7,10 +14,12 @@ const DesignSchema = Schema({
         category: { type: Schema.Types.ObjectId, ref: 'Category' },
         workingTimeDesign: { type: Number },
         workingTime: { type: Number },
+        classSize: { type: Number },
         priorKnowledge: { type: String },
         description: { type: String },
         objetive: { type: String },
         public: { type: Boolean, required: true },
+        isPublic: { type: Boolean, required: true },
         scoreMean: { type: Number, required: true },
         results: { type: [{
             verb: { type: String, required: true },
@@ -43,20 +52,17 @@ const DesignSchema = Schema({
         date: { type: Date, required: true },
         user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     }], required: true },
-    likes: { type: Number, required: true },
-    dislikes: { type: Number, required: true },
-    createdOn: { type: Date, required: true },
-    updatedOn: { type: Date, required: true },
+    likes: { type: Number, default: 0 },
+    dislikes: { type: Number, default: 0 },
     assessments: { type: [{
         user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         score: { type: Number, required: true },
     }], required: true },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    privileges: { type: [{
-        user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-        type: { type: Number, required: true },
-    }], required: true },
+    privileges: { type: [PrivilegeSchema], required: true },
     keywords: { type: [String], required: true },
+}, {
+    timestamps: true,
 });
 
 DesignSchema.methods.toJSON = function () {

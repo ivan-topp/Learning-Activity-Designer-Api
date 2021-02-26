@@ -2,6 +2,7 @@ const { response } = require('express');
 const User = require('../models/User');
 const Folder = require('../models/Folder');
 const Design = require('../models/Design');
+const Category = require('../models/Category');
 const { successResponse, badRequest, internalServerError, createdSuccessful, unauthorized } = require('../utils/responses');
 const mongoose = require('mongoose');
 
@@ -9,9 +10,9 @@ const getRecentDesigns = async (req, res = response) => {
     const { uid } = req;
     try {
         const designs = await Design.find({ privileges: { $elemMatch: { user: uid, type: 0 } } })
-            .sort({ updatedOn: -1 })
+            .sort({ updatedAt: -1 })
             .limit(5)
-            .populate('metadata.category')
+            .populate({ path: 'metadata.category', model: Category })
             .populate('owner', 'name lastname');
         return successResponse('Diseños recientes obtenidos con éxito.', designs, res);
     } catch (error) {
@@ -33,7 +34,7 @@ const getUserDesignsAndFoldersByPath = async (req, res = response) => {
         const designs = await Design.find({ owner: uid, folder: folder.id })
             .skip(from)
             .limit(limit)
-            .populate('metadata.category')
+            .populate({ path: 'metadata.category', model: Category })
             .populate('owner', 'name lastname')
             .populate('folder', 'owner path parent');
         return successResponse('Diseños obtenidos con éxito.', { ownerId: uid, from: from + limit, nPages : Math.ceil(numOfDesigns / limit),  designs }, res);
@@ -71,11 +72,11 @@ const getPublicDesignsByUser = async (req, res = response) => {
     try {
         const user = User.findById(id);
         if (!user) return badRequest('No existe usuario con la id especificada.', res);
-        const numOfDesigns = await Design.countDocuments({ owner: id, 'metadata.public': true });
-        const designs = await Design.find({ owner: id, 'metadata.public': true })
+        const numOfDesigns = await Design.countDocuments({ owner: id, 'metadata.isPublic': true });
+        const designs = await Design.find({ owner: id, 'metadata.isPublic': true })
             .skip(from)
             .limit(limit)
-            .populate('metadata.category')
+            .populate({ path: 'metadata.category', model: Category })
             .populate('owner', 'name lastname')
             .populate('folder', 'owner path parent');
         return successResponse('Se han obtenido con éxito los diseños públicos del usuario especificado.', { ownerId: id, from: from + limit, nPages : Math.ceil(numOfDesigns / limit), designs }, res);
@@ -97,6 +98,43 @@ const updateTLADesing = async( req, res = response ) => {
         if (design.owner.toString() !== uid) return unauthorized('Usted no está autorizado para editar este diseño.', res);
         design = await Design.findByIdAndUpdate(id, title, { rawResult: true });
         return successResponse('TLA del diseño editado', id, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
+};
+
+const createDesign = async (req, res = response) => {
+    const { uid } = req;
+    const { path } = req.body;
+    if (!path) return badRequest('No se ha especificado un carpeta.', res);
+    try {
+        const folder = await Folder.findOne({ path, owner: uid });
+        if (!folder) return badRequest('No existe carpeta con la ruta especificada.', res);
+        newDesign = {
+            folder: folder._id,
+            metadata: {
+                name: 'Nuevo Diseño',
+                isPublic: false,
+                public: false,
+                scoreMean: 0,
+                results: [],
+                classSize: 0,
+            },
+            data: [],
+            comments: [],
+            assessments: [],
+            owner: uid,
+            privileges: [{
+                user: mongoose.Types.ObjectId(uid),
+                type: 0,
+            }],
+            keywords: [],
+        };
+        const design = new Design(newDesign);
+        const designSaved = await design.save({ new: true });
+        return createdSuccessful('Diseño creado con éxito', {design: designSaved}, res);
+        
     } catch (error) {
         console.log(error);
         return internalServerError('Porfavor hable con el administrador.', res);
@@ -130,6 +168,6 @@ module.exports = {
     deleteDesign,
     getPublicDesignsByUser,
     updateTLADesing,
-    addNewTLA
-
+    addNewTLA,
+    createDesign,
 };

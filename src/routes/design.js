@@ -10,11 +10,13 @@ const { getRecentDesigns,
     getPublicDesignsByUser,
     //updateTLADesing,
     addNewTLA,
+    createDesign,
 } = require('../controllers/design');
 const { validateJWT } = require('../middlewares/validateJWT');
 const router = express.Router();
 
 router.get('/recent', validateJWT, getRecentDesigns);
+router.post('/', validateJWT, createDesign);
 router.post('/user', validateJWT, getUserDesignsAndFoldersByPath);
 router.get('/shared-with-user', validateJWT, getDesignsSharedWithUser);
 router.post('/public/user/', validateJWT, getPublicDesignsByUser);

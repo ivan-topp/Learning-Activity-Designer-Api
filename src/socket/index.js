@@ -1,3 +1,6 @@
+const mongoose = require("mongoose");
+const Category = require("../models/Category");
+const Design = require("../models/Design");
 const { DesignRoomList } = require("../models/DesignRoomList");
 
 
@@ -43,6 +46,30 @@ const socketsConfig = ( io ) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             designRoom.removeUser( socket.id );
             return io.to(designId).emit('users', designRoom.users);
+        });
+
+        socket.on('edit-metadata-field', ({ designId, field, value }) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.metadata[field] = value;
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on('save-design', async ({ designId }) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = JSON.parse(JSON.stringify(designRoom.design));
+            try {
+                //console.log(design.metadata);
+                design.metadata.category = mongoose.Types.ObjectId(design.metadata.category._id);
+                //console.log(design.metadata);
+                const updatedDesign = await Design.findByIdAndUpdate(design._id, design, {new: true}).populate({ path: 'metadata.category', model: Category });
+                if (!updatedDesign) return io.to(designId).emit('error', { ok: false, message: 'Error al intentar guardar los cambios.' });
+                console.log('diseño guardado con éxito');
+                return io.to(designId).emit('update-design', designRoom.design);
+            } catch (error) {
+                console.log(error);
+                return io.to(designId).emit('error', { ok: false, message: 'Error al intentar guardar los cambios.' });
+            }
         });
     });
 };

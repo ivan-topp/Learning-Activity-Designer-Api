@@ -1,3 +1,4 @@
+const Category = require('./Category');
 const Design = require('./Design');
 const { DesignRoom } = require("./DesignRoom");
 
@@ -8,7 +9,7 @@ class DesignRoomList {
 
     async addDesignRoom( designId ) {
         try {
-            const design = await Design.findById( designId );
+            const design = await Design.findById( designId ).populate({ path: 'metadata.category', model: Category });
             const newDesignRoom = new DesignRoom( design );
             this.rooms.push(newDesignRoom);
             return newDesignRoom;
