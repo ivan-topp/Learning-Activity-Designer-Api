@@ -71,6 +71,13 @@ const socketsConfig = ( io ) => {
                 return io.to(designId).emit('error', { ok: false, message: 'Error al intentar guardar los cambios.' });
             }
         });
+
+        socket.on('add-learning-result', ({designId, learningResult}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.metadata.results = [...design.metadata.results, learningResult];
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
     });
 };
 
