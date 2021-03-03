@@ -78,6 +78,20 @@ const socketsConfig = ( io ) => {
             design.metadata.results = [...design.metadata.results, learningResult];
             return io.to(designId).emit('update-design', designRoom.design);
         });
+
+        socket.on('edit-learning-result', ({designId, index, learningResult}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.metadata.results[index] = learningResult;
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on('delete-learning-result', ({designId, index}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.metadata.results.splice(index, 1);
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
     });
 };
 
