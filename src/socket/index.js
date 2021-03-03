@@ -52,6 +52,7 @@ const socketsConfig = ( io ) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
             design.metadata[field] = value;
+            
             return io.to(designId).emit('update-design', designRoom.design);
         });
 
@@ -71,6 +72,32 @@ const socketsConfig = ( io ) => {
                 return io.to(designId).emit('error', { ok: false, message: 'Error al intentar guardar los cambios.' });
             }
         });
+        
+        socket.on('edit-unit-field', ({ designId, index, field, value }) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.data.tlas[index][field] = value;
+            console.log(design.data.tlas)
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on( 'new-tla', ({ designId }) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            const newTla = {
+                title: '',
+                description: ''
+            } 
+            design.data.tlas = [...design.data.tlas, newTla];
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on('delete-tla', ({ designId, index })=>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.data.tlas.splice( index, 1);
+            return io.to(designId).emit('update-design', designRoom.design);
+        })
     });
 };
 
