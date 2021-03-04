@@ -86,7 +86,8 @@ const socketsConfig = ( io ) => {
             let design = designRoom.design;
             const newTla = {
                 title: '',
-                description: ''
+                description: '',
+                learningResults: [],
             } 
             design.data.tlas = [...design.data.tlas, newTla];
             return io.to(designId).emit('update-design', designRoom.design);
@@ -119,6 +120,21 @@ const socketsConfig = ( io ) => {
             design.metadata.results.splice(index, 1);
             return io.to(designId).emit('update-design', designRoom.design);
         });
+
+        socket.on('add-learning-result-to-tla', ({designId, tlaIndex, result}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.data.tlas[tlaIndex].learningResults = [...design.data.tlas[tlaIndex].learningResults, result];
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on('delete-learning-result-from-tla', ({designId, tlaIndex, index}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.data.tlas[tlaIndex].learningResults.splice(index, 1);
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
     });
 };
 
