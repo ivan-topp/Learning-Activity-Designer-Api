@@ -87,7 +87,11 @@ const socketsConfig = ( io ) => {
             const newTla = {
                 title: '',
                 description: ''
-            } 
+            }
+            if(design.data.tlas === undefined){
+                design.data.tlas = [newTla]
+                return io.to(designId).emit('update-design', designRoom.design)
+            };
             design.data.tlas = [...design.data.tlas, newTla];
             return io.to(designId).emit('update-design', designRoom.design);
         });
@@ -97,7 +101,41 @@ const socketsConfig = ( io ) => {
             let design = designRoom.design;
             design.data.tlas.splice( index, 1);
             return io.to(designId).emit('update-design', designRoom.design);
-        })
+        });
+
+        socket.on('edit-activity-field', ({ designId, index, indexActivity, field, value }) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.data.tlas[index].activities[indexActivity][field] = value;
+            console.log(design.data.tlas[index].activities);
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on( 'new-activity', ({ designId, index }) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            const newActivity = {
+                description: '',
+                learningType: '',
+                format: '',
+                modality: '',
+                duration: '',
+            }
+            if(design.data.tlas === undefined){
+                design.data.tlas[index].activities = [newActivity]
+                return io.to(designId).emit('update-design', designRoom.design)
+            };
+            design.data.tlas[index].activities = [...design.data.tlas[index].activities, newActivity];
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on( 'delete-activity', ({ designId, index, indexActivity })=>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.data.tlas[index].activities.splice( indexActivity, 1);
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
     });
 };
 
