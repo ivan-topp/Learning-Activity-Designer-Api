@@ -52,7 +52,6 @@ const socketsConfig = ( io ) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
             design.metadata[field] = value;
-            
             return io.to(designId).emit('update-design', designRoom.design);
         });
 
@@ -77,7 +76,6 @@ const socketsConfig = ( io ) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
             design.data.tlas[index][field] = value;
-            console.log(design.data.tlas)
             return io.to(designId).emit('update-design', designRoom.design);
         });
 
@@ -86,8 +84,10 @@ const socketsConfig = ( io ) => {
             let design = designRoom.design;
             const newTla = {
                 title: '',
-                description: ''
-            }
+                description: '',
+                activities: [],
+                learningResults: [],
+            } 
             if(design.data.tlas === undefined){
                 design.data.tlas = [newTla]
                 return io.to(designId).emit('update-design', designRoom.design)
@@ -103,11 +103,10 @@ const socketsConfig = ( io ) => {
             return io.to(designId).emit('update-design', designRoom.design);
         });
 
-        socket.on('edit-activity-field', ({ designId, index, indexActivity, field, value }) => {
+        socket.on('edit-activity-field', ({ designId, tlaIndex, index, field, value }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.data.tlas[index].activities[indexActivity][field] = value;
-            console.log(design.data.tlas[index].activities);
+            design.data.tlas[tlaIndex].activities[index][field] = value;
             return io.to(designId).emit('update-design', designRoom.design);
         });
 
@@ -121,7 +120,7 @@ const socketsConfig = ( io ) => {
                 modality: '',
                 duration: '',
             }
-            if(design.data.tlas === undefined){
+            if(design.data.tlas[index].activities === undefined){
                 design.data.tlas[index].activities = [newActivity]
                 return io.to(designId).emit('update-design', designRoom.design)
             };
@@ -129,10 +128,45 @@ const socketsConfig = ( io ) => {
             return io.to(designId).emit('update-design', designRoom.design);
         });
 
-        socket.on( 'delete-activity', ({ designId, index, indexActivity })=>{
+        socket.on( 'delete-activity', ({ designId, tlaIndex, index })=>{
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.data.tlas[index].activities.splice( indexActivity, 1);
+            design.data.tlas[tlaIndex].activities.splice( index, 1);
+            return io.to(designId).emit('update-design', designRoom.design);
+        })
+
+        socket.on('add-learning-result', ({designId, learningResult}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.metadata.results = [...design.metadata.results, learningResult];
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on('edit-learning-result', ({designId, index, learningResult}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.metadata.results[index] = learningResult;
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on('delete-learning-result', ({designId, index}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.metadata.results.splice(index, 1);
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+        
+        socket.on('add-learning-result-to-tla', ({designId, index, result}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.data.tlas[index].learningResults = [...design.data.tlas[index].learningResults, result];
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on('delete-learning-result-from-tla', ({designId, index, indexLearningResults}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.data.tlas[index].learningResults.splice(indexLearningResults, 1);
             return io.to(designId).emit('update-design', designRoom.design);
         });
 

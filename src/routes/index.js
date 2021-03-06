@@ -6,6 +6,7 @@ app.use('/api/design', require('./design'));
 app.use('/api/user', require('./user'));
 app.use('/api/folder', require('./folder'));
 app.use('/api/category', require('./category'));
+app.use('/api/bloom', require('./bloom'));
 
 app.get('*', (req, res) =>{
     res.sendFile(path.join(__dirname + '/public/index.html'));
