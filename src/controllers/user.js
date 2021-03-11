@@ -7,7 +7,8 @@ const getUser = async(req, res = response)=>{
     const uid = req.params.uid;
     try {
         if (!mongoose.Types.ObjectId.isValid(uid)) return badRequest('No existe usuario con la id especificada.', res);
-        const user = await User.findById( uid );
+        const user = await User.findById( uid )
+            .populate('contacts');
         if(!user) return badRequest('Usuario no encontrado.', res); 
         return successResponse('Usuario encontrado.', user, res);
     } catch (error) {
@@ -97,6 +98,7 @@ const deleteContact = async(req, res = response) =>{
         return internalServerError('Porfavor hable con el administrador.', res);
     }
 };
+
 module.exports = {
     addNewContact,
     deleteContact,
