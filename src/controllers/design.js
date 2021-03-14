@@ -118,6 +118,7 @@ const createDesign = async (req, res = response) => {
                 isPublic: false,
                 public: false,
                 scoreMean: 0,
+                category: mongoose.Types.ObjectId('603428218fe538f505b5ac90'),
                 results: [],
                 classSize: 0,
             },
