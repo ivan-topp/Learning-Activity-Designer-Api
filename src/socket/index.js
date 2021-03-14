@@ -1,42 +1,57 @@
 const mongoose = require("mongoose");
 const Category = require("../models/Category");
 const Design = require("../models/Design");
+const { DesignRoom } = require("../models/DesignRoom");
 const { DesignRoomList } = require("../models/DesignRoomList");
+const { verifyJWT } = require("../utils/jwt");
 
 
 const socketsConfig = ( io ) => {
     const designRooms = new DesignRoomList();
     io.on('connection', ( socket ) => {
-        console.log('Cliente conectado');
+
+        const [ isValid, uid ] = verifyJWT(socket.handshake.query['x-token']);
+        if(!isValid){
+            console.log('Socket no identificado');
+            return socket.disconnect();
+        }
+        console.log('Se ha conectado el usuario: ', uid);
 
         socket.on('disconnect', () => {
-            console.log('cliente desconectado');         
+            console.log('Se ha desconectado el usuario: ', uid);     
         });
 
         socket.on('disconnecting', () => {
             socket.rooms.forEach(room => {
                 if(socket.id !== room){
                     const designRoom = designRooms.getDesignRoomById(room);
-                    designRoom.removeUser( socket.id );
-                    io.to(room).emit('users', designRoom.getUsers());
+                    if (designRoom) {
+                        designRoom.removeUser( socket.id );
+                        return io.to(designRoom.id).emit('users', designRoom.getUsers());
+                    }
                 }
             });
         });
-        // TODO: Verify that the user is editor of the design.
+
         socket.on('join-to-design', async ({ user, designId }, callback) => {
             let designRoom = designRooms.getDesignRoomById( designId );
-            let resp = { ok: false, message: 'Error al intentar ingresar a la sala.'};
-            if( !designRoom ) {
-                designRoom = await designRooms.addDesignRoom( designId );
-                if( designRoom ) {
+            let resp = { ok: false, message: 'Ha ocurrido un error, el diseño no existe o usted no tiene privilegios para editar este diseño.'};
+            if (mongoose.Types.ObjectId.isValid(designId)){
+                if( !designRoom ) {
+                    const isEditor = await DesignRoom.hasEditor(designId, uid);
+                    if(isEditor){
+                        designRoom = await designRooms.addDesignRoom( designId );
+                        if( designRoom ) {
+                            socket.join( designId );
+                            resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
+                            io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
+                        }
+                    }
+                }else{
                     socket.join( designId );
                     resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
                     io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
                 }
-            }else{
-                socket.join( designId );
-                resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
-                io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
             }
             return callback(resp);
         });
@@ -44,8 +59,10 @@ const socketsConfig = ( io ) => {
         socket.on('leave-from-design', ({ user, designId }) => {
             socket.leave( designId );
             let designRoom = designRooms.getDesignRoomById( designId );
-            designRoom.removeUser( socket.id );
-            return io.to(designId).emit('users', designRoom.users);
+            if (designRoom) {
+                designRoom.removeUser( socket.id );
+                return io.to(designId).emit('users', designRoom.getUsers());
+            }
         });
 
         socket.on('edit-metadata-field', ({ designId, field, value }) => {
@@ -59,9 +76,7 @@ const socketsConfig = ( io ) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = JSON.parse(JSON.stringify(designRoom.design));
             try {
-                //console.log(design.metadata);
                 design.metadata.category = mongoose.Types.ObjectId(design.metadata.category._id);
-                //console.log(design.metadata);
                 const updatedDesign = await Design.findByIdAndUpdate(design._id, design, {new: true}).populate({ path: 'metadata.category', model: Category });
                 if (!updatedDesign) return io.to(designId).emit('error', { ok: false, message: 'Error al intentar guardar los cambios.' });
                 console.log('diseño guardado con éxito');
@@ -145,6 +160,12 @@ const socketsConfig = ( io ) => {
         socket.on('edit-learning-result', ({designId, index, learningResult}) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
+            const targetLearningResult = design.metadata.results[index];
+            design.data.tlas.forEach(tla => {
+                tla.learningResults.forEach((lr, i)=>{
+                    if(lr.verb === targetLearningResult.verb && lr.description === targetLearningResult.description) tla.learningResults[i] = learningResult;
+                });
+            });
             design.metadata.results[index] = learningResult;
             return io.to(designId).emit('update-design', designRoom.design);
         });
@@ -152,6 +173,12 @@ const socketsConfig = ( io ) => {
         socket.on('delete-learning-result', ({designId, index}) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
+            const targetLearningResult = design.metadata.results[index];
+            design.data.tlas.forEach(tla => {
+                tla.learningResults.forEach((lr, i)=>{
+                    if(lr.verb === targetLearningResult.verb && lr.description === targetLearningResult.description) tla.learningResults.splice(i, 1);
+                });
+            });
             design.metadata.results.splice(index, 1);
             return io.to(designId).emit('update-design', designRoom.design);
         });

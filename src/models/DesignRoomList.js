@@ -20,8 +20,12 @@ class DesignRoomList {
     }
 
     getDesignRoomById( id ) {
-        const roomFiltered = this.rooms.filter( (designRoom) => designRoom.id == id);
-        return roomFiltered.length > 0 ? roomFiltered[0] : null;
+        try {
+            const roomFiltered = this.rooms.filter( (designRoom) => designRoom.id == id);
+            return roomFiltered.length > 0 ? roomFiltered[0] : null;
+        } catch (error) {
+            return false;
+        }
     }
 
     removeDesignRoom( id ) {

@@ -1,8 +1,22 @@
+const Design = require("./Design");
+
 class DesignRoom {
     constructor( design ) {
         this.id = design._id.toString();
         this.users = [];
         this.design = design;
+    }
+
+    static async hasEditor(designId, uid){
+        try {
+            const design = await Design.findById( designId );
+            if(!design) return false;
+            for (const privilege of design.privileges) if(privilege.user == uid && privilege.type === 0) return true;
+            return false;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 
     addUser( user ) {
