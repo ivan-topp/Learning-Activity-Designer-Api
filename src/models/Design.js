@@ -27,14 +27,14 @@ const DesignSchema = Schema({
         }], required: true },
     }, required: true },
     data: { type: {
-        tlas: { type: [{
+        learningActivities: { type: [{
             title: { type: String, required: true },
             description: { type: String, required: true },
             learningResults: { type: [{
                 verb: { type: String, required: true },
                 description: { type: String, required: true },
             }], required: true },
-            activities: { type: [{
+            tasks: { type: [{
                 description: { type: String, required: true },
                 duration: { type: Number, required: true },
                 learningType: { type: String, required: true },

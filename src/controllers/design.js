@@ -123,7 +123,7 @@ const createDesign = async (req, res = response) => {
                 classSize: 0,
             },
             data: {
-                tlas: []
+                learningActivities: []
             },
             comments: [],
             assessments: [],
