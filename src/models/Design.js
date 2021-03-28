@@ -13,7 +13,10 @@ const DesignSchema = Schema({
         name: { type: String, required: true },
         category: { type: Schema.Types.ObjectId, ref: 'Category' },
         workingTimeDesign: { type: Number },
-        workingTime: { type: Number },
+        workingTime: { type: {
+            hours: { type: Number },
+            minutes: { type: Number },
+        } },
         classSize: { type: Number },
         priorKnowledge: { type: String },
         description: { type: String },
@@ -36,7 +39,10 @@ const DesignSchema = Schema({
             }], required: true },
             tasks: { type: [{
                 description: { type: String, required: true },
-                duration: { type: Number, required: true },
+                duration: { type: {
+                    hours: { type: Number, required: true },
+                    minutes: { type: Number, required: true },
+                } },
                 learningType: { type: String, required: true },
                 format: { type: String, required: true },
                 modality: { type: String, required: true },

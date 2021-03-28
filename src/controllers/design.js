@@ -120,6 +120,10 @@ const createDesign = async (req, res = response) => {
                 scoreMean: 0,
                 category: mongoose.Types.ObjectId('603428218fe538f505b5ac90'),
                 results: [],
+                workingTime: {
+                    hours: 0,
+                    minutes: 0,
+                },
                 classSize: 0,
             },
             data: {

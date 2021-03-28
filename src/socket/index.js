@@ -32,7 +32,7 @@ const socketsConfig = ( io ) => {
                 }
             });
         });
-
+        
         socket.on('join-to-design', async ({ user, designId }, callback) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let resp = { ok: false, message: 'Ha ocurrido un error, el diseño no existe o usted no tiene privilegios para editar este diseño.'};
@@ -65,11 +65,12 @@ const socketsConfig = ( io ) => {
             }
         });
 
-        socket.on('edit-metadata-field', ({ designId, field, value }) => {
+        socket.on('edit-metadata-field', ({ designId, field, value, subfield=null }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.metadata[field] = value;
-            return io.to(designId).emit('update-design', designRoom.design);
+            if (subfield !== null) design.metadata[field][subfield] = value;
+            else design.metadata[field] = value;
+            return io.to(designId).emit('edit-metadata-field', { field, value, subfield });
         });
 
         socket.on('save-design', async ({ designId }) => {
@@ -100,7 +101,7 @@ const socketsConfig = ( io ) => {
             const newTla = {
                 title: '',
                 description: '',
-                task: [],
+                tasks: [],
                 learningResults: [],
             } 
             if(design.data.learningActivities === undefined){
@@ -118,11 +119,12 @@ const socketsConfig = ( io ) => {
             return io.to(designId).emit('update-design', designRoom.design);
         });
 
-        socket.on('edit-task-field', ({ designId, learningActivityIndex, index, field, value }) => {
+        socket.on('edit-task-field', ({ designId, learningActivityIndex, index, field, value, subfield }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.data.learningActivities[learningActivityIndex].tasks[index][field] = value;
-            return io.to(designId).emit('update-design', designRoom.design);
+            if(subfield !== null) design.data.learningActivities[learningActivityIndex].tasks[index][field][subfield] = value;
+            else design.data.learningActivities[learningActivityIndex].tasks[index][field] = value;
+            return io.to(designId).emit('edit-task-field', { learningActivityIndex, index, field, value, subfield });
         });
 
         socket.on( 'new-task', ({ designId, index }) => {
@@ -133,7 +135,10 @@ const socketsConfig = ( io ) => {
                 learningType: '',
                 format: '',
                 modality: '',
-                duration: '',
+                duration: {
+                    hours: 0,
+                    minutes: 0,
+                },
             }
             if(design.data.learningActivities[index].tasks === undefined){
                 design.data.learningActivities[index].tasks = [newTasks]

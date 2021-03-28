@@ -20,7 +20,8 @@ class DesignRoom {
     }
 
     addUser( user ) {
-        this.users.push(user);
+        let existUser = this.users.find(u => u.socketId === user.socketId);
+        if (!existUser) this.users.push(user);
         return this.users;
     }
 
