@@ -45,7 +45,24 @@ const getUserDesignsAndFoldersByPath = async (req, res = response) => {
 }
 
 const getDesignsSharedWithUser = async (req, res = response) => {
-    return successResponse('getDesignsSharedWithUser: Connected!!', ['Design#1', 'Design#2', 'Design#3'], res);
+    const { uid } = req;
+    let { from, limit } = req.body;
+    from = from || 0;
+    limit = limit || 12;
+    if (!uid) return badRequest('No se ha especificado un usuario.', res);
+    try {
+        const numOfDesigns = await Design.countDocuments({ owner: { $ne: uid}, privileges: { $elemMatch: { user: uid } } });
+        const designs = await Design.find({ owner: { $ne: uid}, privileges: { $elemMatch: { user: uid } } })
+            .skip(from)
+            .limit(limit)    
+            .sort({ updatedAt: -1 })
+            .populate({ path: 'metadata.category', model: Category })
+            .populate('owner', 'name lastname');
+        return successResponse('Diseños obtenidos con éxito.', { ownerId: uid, from: from + limit, nPages : Math.ceil(numOfDesigns / limit),  designs }, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
 }
 
 const deleteDesign = async (req, res = response) => {
@@ -106,8 +123,9 @@ const updateTLADesing = async( req, res = response ) => {
 
 const createDesign = async (req, res = response) => {
     const { uid } = req;
-    const { path } = req.body;
+    let { path, isPublic } = req.body;
     if (!path) return badRequest('No se ha especificado un carpeta.', res);
+    isPublic = isPublic !== null ? isPublic : false;
     try {
         const folder = await Folder.findOne({ path, owner: uid });
         if (!folder) return badRequest('No existe carpeta con la ruta especificada.', res);
@@ -115,7 +133,7 @@ const createDesign = async (req, res = response) => {
             folder: folder._id,
             metadata: {
                 name: 'Nuevo Diseño',
-                isPublic: false,
+                isPublic: isPublic,
                 public: false,
                 scoreMean: 0,
                 category: mongoose.Types.ObjectId('603428218fe538f505b5ac90'),

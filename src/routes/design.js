@@ -16,7 +16,7 @@ const router = express.Router();
 router.get('/recent', validateJWT, getRecentDesigns);
 router.post('/', validateJWT, createDesign);
 router.post('/user', validateJWT, getUserDesignsAndFoldersByPath);
-router.get('/shared-with-user', validateJWT, getDesignsSharedWithUser);
+router.post('/shared-with-user', validateJWT, getDesignsSharedWithUser);
 router.post('/public/user/', validateJWT, getPublicDesignsByUser);
 router.delete('/:id', validateJWT, deleteDesign);
 module.exports = router;
