@@ -33,7 +33,32 @@ const getFoldersByPath = async (req, res = response) => {
     }
 }
 
+// TODO: Resibir id de carpeta en vez de buscar por nombre.
+
+const createFolder = async (req, res = response) => {
+    const { uid } = req;
+    const { path, folderName } = req.body;
+    if (!path) return badRequest('No se ha especificado una ruta de carpeta.', res);
+    if (!folderName) return badRequest('No se ha especificado un nombre para la carpeta.', res);
+    try {
+        const parentFolder = await Folder.findOne({ path, owner: uid });
+        if(!parentFolder) return badRequest('Carpeta padre no encontrada.', res);
+        const folder = new Folder({
+            parent: parentFolder._id,
+            owner: uid,
+            path: (path === '/') ? path + folderName : path + '/' + folderName,
+            name: folderName,
+        });
+        await folder.save();
+        return successResponse('Carpeta creada con éxito.', folder, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
+}
+
 module.exports = {
     deleteFolder,
     getFoldersByPath,
+    createFolder,
 };

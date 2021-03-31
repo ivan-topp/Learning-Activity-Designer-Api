@@ -3,7 +3,9 @@ const { Schema, model } = require('mongoose');
 const FolderSchema = Schema({
     parent: { type: Schema.Types.ObjectId, ref: 'Folder' },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    path: { type: String, required: true }
+    path: { type: String, required: true },
+    name: { type: String },
+
 });
 
 FolderSchema.methods.toJSON = function () {
