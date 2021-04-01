@@ -122,9 +122,13 @@ const socketsConfig = ( io ) => {
         socket.on('edit-task-field', ({ designId, learningActivityIndex, index, field, value, subfield }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            if(subfield !== null) design.data.learningActivities[learningActivityIndex].tasks[index][field][subfield] = value;
-            else design.data.learningActivities[learningActivityIndex].tasks[index][field] = value;
-            return io.to(designId).emit('edit-task-field', { learningActivityIndex, index, field, value, subfield });
+            try {
+                if(subfield !== null) design.data.learningActivities[learningActivityIndex].tasks[index][field][subfield] = value;
+                else design.data.learningActivities[learningActivityIndex].tasks[index][field] = value;
+                return io.to(designId).emit('edit-task-field', { learningActivityIndex, index, field, value, subfield });
+            } catch (error) {
+                console.log(error.message);
+            }
         });
 
         socket.on( 'new-task', ({ designId, index }) => {
