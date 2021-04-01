@@ -197,6 +197,17 @@ const socketsConfig = ( io ) => {
             return io.to(designId).emit('update-design', designRoom.design);
         });
 
+        socket.on('change-design-privileges', async({designId, privileges}) =>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            const newDesign = await Design.findByIdAndUpdate(designId, {privileges}, {new: true});
+            if (newDesign) {
+                design.privileges = privileges;
+                return io.to(designId).emit('change-design-privileges', privileges);
+            } else {
+                return io.to(designId).emit('error', { ok: false, message: 'Error al intentar registrar usuarios al diseño.' });
+            }
+        });
     });
 };
 

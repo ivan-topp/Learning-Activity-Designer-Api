@@ -9,7 +9,7 @@ class DesignRoomList {
 
     async addDesignRoom( designId ) {
         try {
-            const design = await Design.findById( designId ).populate({ path: 'metadata.category', model: Category });
+            const design = await Design.findById( designId ).populate({ path: 'metadata.category', model: Category }).populate('privileges.user', 'name lastname email img');
             const newDesignRoom = new DesignRoom( design );
             this.rooms.push(newDesignRoom);
             return newDesignRoom;
