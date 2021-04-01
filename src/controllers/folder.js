@@ -33,8 +33,6 @@ const getFoldersByPath = async (req, res = response) => {
     }
 }
 
-// TODO: Resibir id de carpeta en vez de buscar por nombre.
-
 const createFolder = async (req, res = response) => {
     const { uid } = req;
     const { path, folderName } = req.body;
@@ -43,10 +41,13 @@ const createFolder = async (req, res = response) => {
     try {
         const parentFolder = await Folder.findOne({ path, owner: uid });
         if(!parentFolder) return badRequest('Carpeta padre no encontrada.', res);
+        const newPath = (path === '/') ? path + folderName : path + '/' + folderName;
+        const folderExists = await Folder.findOne({ path: newPath, owner: uid, name: folderName});
+        if(folderExists) return badRequest(`Ya existe una carpeta en este directorio con el nombre "${folderName}".`, res);
         const folder = new Folder({
             parent: parentFolder._id,
             owner: uid,
-            path: (path === '/') ? path + folderName : path + '/' + folderName,
+            path: newPath,
             name: folderName,
         });
         await folder.save();
