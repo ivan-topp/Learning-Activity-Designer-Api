@@ -91,8 +91,12 @@ const socketsConfig = ( io ) => {
         socket.on('edit-unit-field', ({ designId, index, field, value }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.data.learningActivities[index][field] = value;
-            return io.to(designId).emit('update-design', designRoom.design);
+            try {
+                design.data.learningActivities[index][field] = value;
+                return io.to(designId).emit('update-design', designRoom.design);
+            } catch (error) {
+                console.log(error.message);
+            }
         });
 
         socket.on( 'new-learningActivity', ({ designId }) => {
