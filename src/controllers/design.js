@@ -166,6 +166,10 @@ const createDesign = async (req, res = response) => {
     }
 };
 
+const getPublicFilteredDesigns = async (req, res = response) => {
+    successResponse('test', {}, res);
+};
+
 module.exports = {
     getRecentDesigns,
     getUserDesignsAndFoldersByPath,
@@ -174,4 +178,5 @@ module.exports = {
     getPublicDesignsByUser,
     updateTLADesing,
     createDesign,
+    getPublicFilteredDesigns,
 };
