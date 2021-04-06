@@ -221,6 +221,45 @@ const socketsConfig = ( io ) => {
                 return io.to(designId).emit('error', { ok: false, message: 'Error al intentar registrar usuarios al diseño.' });
             }
         });
+
+        socket.on('add-design-keyword', async({designId, keyword}) =>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            let newKeywords = [...design.keywords];
+            if(newKeywords.includes(keyword)) return io.to(designId).emit('error', { ok: false, message: 'La palabra clave ya existe.' });
+            newKeywords = [...newKeywords, keyword];
+            try {
+                const newDesign = await Design.findByIdAndUpdate(designId, {keywords: newKeywords}, {new: true});
+                if (newDesign) {
+                    design.keywords = newKeywords;
+                    return io.to(designId).emit('add-design-keyword', keyword);
+                } else {
+                    return io.to(designId).emit('error', { ok: false, message: 'Error al agregar la palabra clave.' });
+                }
+            } catch (error) {
+                console.log(error);
+                return io.to(designId).emit('error', { ok: false, message: 'Error al agregar la palabra clave.' });
+            }
+        });
+
+        socket.on('remove-design-keyword', async({designId, keyword}) =>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            let newKeywords = [...design.keywords];
+            newKeywords = newKeywords.filter( k => k !== keyword );
+            try {
+                const newDesign = await Design.findByIdAndUpdate(designId, {keywords: newKeywords}, {new: true});
+                if (newDesign) {
+                    design.keywords = newKeywords;
+                    return io.to(designId).emit('remove-design-keyword', keyword);
+                } else {
+                    return io.to(designId).emit('error', { ok: false, message: 'Error al eliminar la palabra clave.' });
+                }
+            } catch (error) {
+                console.log(error);
+                return io.to(designId).emit('error', { ok: false, message: 'Error al eliminar la palabra clave.' });
+            }
+        });
     });
 };
 

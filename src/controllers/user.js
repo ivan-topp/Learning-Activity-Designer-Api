@@ -2,6 +2,7 @@ const {response} = require('express');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const { badRequest, internalServerError, successResponse } = require('../utils/responses');
+const { caseAndAccentInsensitive } = require('../utils/text');
 
 const getUser = async(req, res = response)=>{
     const uid = req.params.uid;
@@ -22,11 +23,26 @@ const searchUsers = async(req, res = response)=>{
     limit = limit || 12;
     try {
         if(!filter) return badRequest('Filtro de usuarios no especificado.', res);
-        const numOfUsers = await User.countDocuments({ $text: { $search: filter } });
-        const users = await User.find({ $text: { $search: filter } })
-            .skip(from)
-            .limit(limit);
-        return successResponse('Usuarios obtenidos correctamente.', { users, from: from + limit, nPages: Math.ceil(numOfUsers / limit)}, res);
+        const mainFilter = [];
+        filter.split(' ').forEach(word => {
+            if(word.trim().length) {
+                mainFilter.push(...[
+                    { 'name': {'$regex' : `.*${caseAndAccentInsensitive(word)}.*`, '$options' : 'i'} },
+                    { 'lastname': {'$regex' : `.*${caseAndAccentInsensitive(word)}.*`, '$options' : 'i'} },
+                    { 'email': {'$regex' : `.*${caseAndAccentInsensitive(word)}.*`, '$options' : 'i'} },
+                    { 'city': {'$regex' : `.*${caseAndAccentInsensitive(word)}.*`, '$options' : 'i'} },
+                    { 'country': {'$regex' : `.*${caseAndAccentInsensitive(word)}.*`, '$options' : 'i'} },
+                ]);
+            }
+        });
+        const numOfUsers = await User.aggregate([{ $match: mainFilter.length ? { $or: mainFilter } : {} }, {$count: "users"}]);
+        const users = await User.aggregate([
+            { $match: mainFilter.length ? { $or: mainFilter } : {} }, 
+            {$skip: from }, 
+            {$limit: limit},
+            { $sort: { "name": 1, "lastname": 1 } }]);
+        const nPages = numOfUsers.length ? Math.ceil(numOfUsers[0].users / limit) : 0;
+        return successResponse('Usuarios obtenidos correctamente.', { users, from: from + limit, nPages }, res);
     } catch (error) {
         console.log(error);
         return internalServerError('Porfavor hable con el administrador.', res);

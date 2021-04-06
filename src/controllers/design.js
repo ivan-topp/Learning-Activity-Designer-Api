@@ -5,6 +5,7 @@ const Design = require('../models/Design');
 const Category = require('../models/Category');
 const { successResponse, badRequest, internalServerError, createdSuccessful, unauthorized } = require('../utils/responses');
 const mongoose = require('mongoose');
+const { caseAndAccentInsensitive } = require('../utils/text');
 
 const getRecentDesigns = async (req, res = response) => {
     const { uid } = req;
@@ -30,6 +31,7 @@ const getUserDesignsAndFoldersByPath = async (req, res = response) => {
     if (!path) return badRequest('No se ha especificado un carpeta.', res);
     try {
         const folder = await Folder.findOne({ path, owner: uid });
+        if (!folder) return badRequest('La carpeta especificada no existe.', res);
         const numOfDesigns = await Design.countDocuments({ owner: uid, folder: folder.id });
         const designs = await Design.find({ owner: uid, folder: folder.id })
             .skip(from)
@@ -167,7 +169,61 @@ const createDesign = async (req, res = response) => {
 };
 
 const getPublicFilteredDesigns = async (req, res = response) => {
-    successResponse('test', {}, res);
+    let { filter, keywords, categories, from, limit } = req.body;
+    from = from || 0;
+    limit = limit || 12;
+    try {
+        const keywordFilter = [];
+        const categoriesFilter = [];
+        const mainFilter = [];
+        keywords.forEach(keyword => {
+            keywordFilter.push({
+                'keywords': { '$elemMatch': {'$regex' : `.*${caseAndAccentInsensitive(keyword)}.*`, '$options' : 'i'} }
+            });
+        });
+        categories.forEach(category => {
+            categoriesFilter.push({
+                'metadata.category': mongoose.Types.ObjectId(category._id)
+            });
+        });
+        filter.split(' ').forEach(word => {
+            if(word.trim().length) {
+                mainFilter.push(...[
+                    { 'owner.name': {'$regex' : `.*${caseAndAccentInsensitive(word)}.*`, '$options' : 'i'} },
+                    { 'owner.lastname': {'$regex' : `.*${caseAndAccentInsensitive(word)}.*`, '$options' : 'i'} },
+                    { 'metadata.name': {'$regex' : `.*${caseAndAccentInsensitive(word)}.*`, '$options' : 'i'} },
+                ]);
+            }
+        });
+        const aggregation = [
+            { $match: { $and: [
+                { 'metadata.isPublic': true },
+                ...keywordFilter,
+                categoriesFilter.length ? { $or: categoriesFilter } : {},
+            ] } },
+            { $lookup: {
+                'from': 'users',
+                'let': {'ownerId': '$owner'}, 
+                'pipeline': [
+                    { $match: { "$expr": { "$eq": [ "$_id", "$$ownerId" ] } } },
+                    { $project: { name: 1, lastname: 1, email: 1  }  },
+                ],
+                'as': 'owner',
+            } },
+            { $unwind: "$owner" },
+            { $match: mainFilter.length ? { $or: mainFilter } : {} },
+            { $lookup: {from: 'categories', localField: 'metadata.category', foreignField: '_id', as: 'metadata.category'} },
+            { $unwind: "$metadata.category" },
+            { $sort: { "metadata.scoreMean": -1, "updatedAt": -1 } },
+        ];
+        const numOfDesigns = await Design.aggregate([...aggregation, {$count: "designs"}]);
+        const designs = await Design.aggregate([...aggregation, {$skip: from }, {$limit: limit}]);
+        const nPages = numOfDesigns.length ? Math.ceil(numOfDesigns[0].designs / limit) : 0;
+        return successResponse('Se han filtrado con éxito los diseños públicos.', { from: from + limit, nPages, designs }, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
 };
 
 module.exports = {
