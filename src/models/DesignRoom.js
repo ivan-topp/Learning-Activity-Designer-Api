@@ -18,6 +18,19 @@ class DesignRoom {
             return false;
         }
     }
+    
+    static async hasReader(designId, uid){
+        try {
+            const design = await Design.findById( designId );
+            if(!design) return false;
+            for (const privilege of design.privileges) if(privilege.user == uid && privilege.type === 1) return true;
+            if (design.metadata.isPublic) return true;
+            return false;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
 
     addUser( user ) {
         let existUser = this.users.find(u => u.socketId === user.socketId);

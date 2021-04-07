@@ -33,12 +33,13 @@ const socketsConfig = ( io ) => {
             });
         });
         
-        socket.on('join-to-design', async ({ user, designId }, callback) => {
+        socket.on('join-to-design', async ({ user, designId, public }, callback) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let resp = { ok: false, message: 'Ha ocurrido un error, el diseño no existe o usted no tiene privilegios para editar este diseño.'};
             if (mongoose.Types.ObjectId.isValid(designId)){
+                const isEditor = await DesignRoom.hasEditor(designId, uid);
+                const isReader = await DesignRoom.hasReader(designId, uid);
                 if( !designRoom ) {
-                    const isEditor = await DesignRoom.hasEditor(designId, uid);
                     if(isEditor){
                         designRoom = await designRooms.addDesignRoom( designId );
                         if( designRoom ) {
@@ -46,11 +47,26 @@ const socketsConfig = ( io ) => {
                             resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
                             io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
                         }
+                    } else if (isReader) {
+                        designRoom = await designRooms.addDesignRoom( designId );
+                        if( designRoom && public) {
+                            socket.join( designId );
+                            resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
+                            io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
+                        }
                     }
-                }else{
-                    socket.join( designId );
-                    resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
-                    io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
+                } else {
+                    if(isEditor){
+                        socket.join( designId );
+                        resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
+                        io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
+                    } else if (isReader) {
+                        if( public) {
+                            socket.join( designId );
+                            resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
+                            io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
+                        }
+                    }
                 }
             }
             return callback(resp);
