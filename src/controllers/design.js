@@ -6,6 +6,7 @@ const Category = require('../models/Category');
 const { successResponse, badRequest, internalServerError, createdSuccessful, unauthorized } = require('../utils/responses');
 const mongoose = require('mongoose');
 const { caseAndAccentInsensitive } = require('../utils/text');
+const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 const getRecentDesigns = async (req, res = response) => {
     const { uid } = req;
@@ -156,6 +157,7 @@ const createDesign = async (req, res = response) => {
                 user: mongoose.Types.ObjectId(uid),
                 type: 0,
             }],
+            readOnlyLink: uuidv4(),
             keywords: [],
         };
         const design = new Design(newDesign);
@@ -226,6 +228,20 @@ const getPublicFilteredDesigns = async (req, res = response) => {
     }
 };
 
+const getDesignByLink = async (req, res = response) => {
+    let { link } = req.params;
+    if (!link || (link && link.trim().length === 0)) return badRequest('No se ha especificado un enlace.', res);
+    try {
+        if(!uuidValidate(link)) return badRequest('El enlace no es válido.', res);
+        const design = await Design.findOne({ readOnlyLink: link });
+        if(!design) return badRequest('No se ha encontrado diseño con el enlace especificado.', res);
+        return successResponse('Se ha encontrado el diseño con éxito.', { design }, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
+};
+
 module.exports = {
     getRecentDesigns,
     getUserDesignsAndFoldersByPath,
@@ -235,4 +251,5 @@ module.exports = {
     updateTLADesing,
     createDesign,
     getPublicFilteredDesigns,
+    getDesignByLink,
 };

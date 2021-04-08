@@ -4,6 +4,7 @@ const Design = require("../models/Design");
 const { DesignRoom } = require("../models/DesignRoom");
 const { DesignRoomList } = require("../models/DesignRoomList");
 const { verifyJWT } = require("../utils/jwt");
+const { v4: uuidv4, } = require('uuid');
 
 
 const socketsConfig = ( io ) => {
@@ -274,6 +275,24 @@ const socketsConfig = ( io ) => {
             } catch (error) {
                 console.log(error);
                 return io.to(designId).emit('error', { ok: false, message: 'Error al eliminar la palabra clave.' });
+            }
+        });
+
+        socket.on('generate-new-share-link', async({ designId }) =>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            try {
+                const newLink = uuidv4();
+                const newDesign = await Design.findByIdAndUpdate(designId, { readOnlyLink: newLink }, {new: true});
+                if (newDesign) {
+                    design.readOnlyLink = newLink;
+                    return io.to(designId).emit('change-read-only-link', newLink);
+                } else {
+                    return io.to(designId).emit('error', { ok: false, message: 'Error al generar el nuevo enlace.' });
+                }
+            } catch (error) {
+                console.log(error);
+                return io.to(designId).emit('error', { ok: false, message: 'Error al generar el nuevo enlace.' });
             }
         });
     });

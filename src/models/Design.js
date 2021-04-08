@@ -66,6 +66,7 @@ const DesignSchema = Schema({
     }], required: true },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     privileges: { type: [PrivilegeSchema], required: true },
+    readOnlyLink: { type: String, required: true },
     keywords: { type: [String], required: true },
 }, {
     timestamps: true,

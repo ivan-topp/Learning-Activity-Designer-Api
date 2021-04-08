@@ -10,16 +10,20 @@ const { getRecentDesigns,
     getPublicDesignsByUser,
     createDesign,
     getPublicFilteredDesigns,
+    getDesignByLink,
 } = require('../controllers/design');
 const { validateJWT } = require('../middlewares/validateJWT');
 const router = express.Router();
 
 router.get('/recent', validateJWT, getRecentDesigns);
+router.get('/shared-link/:link', getDesignByLink);
 router.post('/', validateJWT, createDesign);
 router.post('/user', validateJWT, getUserDesignsAndFoldersByPath);
 router.post('/shared-with-user', validateJWT, getDesignsSharedWithUser);
 router.post('/public/user/', validateJWT, getPublicDesignsByUser);
-router.delete('/:id', validateJWT, deleteDesign);
 router.post('/public-repository', validateJWT, getPublicFilteredDesigns);
+router.delete('/:id', validateJWT, deleteDesign);
+
+
 
 module.exports = router;
