@@ -37,6 +37,7 @@ const getUserDesignsAndFoldersByPath = async (req, res = response) => {
         const designs = await Design.find({ owner: uid, folder: folder.id })
             .skip(from)
             .limit(limit)
+            .sort({ updatedAt: -1 })
             .populate({ path: 'metadata.category', model: Category })
             .populate('owner', 'name lastname')
             .populate('folder', 'owner path parent');
@@ -137,7 +138,6 @@ const createDesign = async (req, res = response) => {
             metadata: {
                 name: 'Nuevo Diseño',
                 isPublic: isPublic,
-                public: false,
                 scoreMean: 0,
                 category: mongoose.Types.ObjectId('603428218fe538f505b5ac90'),
                 results: [],
@@ -242,6 +242,53 @@ const getDesignByLink = async (req, res = response) => {
     }
 };
 
+const duplicateDesign = async (req, res = response) => {
+    const { uid } = req;
+    let { id } = req.body;
+    if (!id || (id && id.trim().length === 0)) return badRequest('No se ha especificado un diseño para duplicar.', res);
+    if (!mongoose.Types.ObjectId.isValid(id)) return badRequest('No existe diseño de aprendizaje con la id especificada.', res);
+    try {
+        const design = await Design.findById(id);
+        if(!design) return badRequest('No existe diseño de aprendizaje con la id especificada.', res);
+        const folder = await Folder.findOne({ owner: uid, path: '/' });
+        if(!folder) return badRequest('Error con la carpeta del diseño especificado.', res);
+        const newDesignJson = {
+            folder: folder._id,
+            metadata: {
+                name: design.metadata.name + ' (Duplicado)',
+                isPublic: false,
+                scoreMean: 0,
+                workingTimeDesign: design.metadata.workingTimeDesign,
+                category: design.metadata.category,
+                results: design.metadata.results,
+                workingTime: design.metadata.workingTime,
+                classSize: design.metadata.classSize,
+                description: design.metadata.description,
+                priorKnowledge: design.metadata.priorKnowledge,
+                objective: design.metadata.objective,
+            },
+            data: design.data,
+            comments: [],
+            assessments: [],
+            owner: uid,
+            privileges: [{
+                user: mongoose.Types.ObjectId(uid),
+                type: 0,
+            }],
+            readOnlyLink: uuidv4(),
+            keywords: design.keywords,
+            origin: mongoose.Types.ObjectId(id),
+        };
+
+        const newDesign = new Design(newDesignJson);
+        await newDesign.save();
+        return successResponse('Diseño duplicado con éxito.', { newDesign }, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
+};
+
 module.exports = {
     getRecentDesigns,
     getUserDesignsAndFoldersByPath,
@@ -252,4 +299,5 @@ module.exports = {
     createDesign,
     getPublicFilteredDesigns,
     getDesignByLink,
+    duplicateDesign,
 };

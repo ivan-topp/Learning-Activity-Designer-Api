@@ -11,6 +11,7 @@ const { getRecentDesigns,
     createDesign,
     getPublicFilteredDesigns,
     getDesignByLink,
+    duplicateDesign,
 } = require('../controllers/design');
 const { validateJWT } = require('../middlewares/validateJWT');
 const router = express.Router();
@@ -18,6 +19,7 @@ const router = express.Router();
 router.get('/recent', validateJWT, getRecentDesigns);
 router.get('/shared-link/:link', getDesignByLink);
 router.post('/', validateJWT, createDesign);
+router.post('/duplicate', validateJWT, duplicateDesign);
 router.post('/user', validateJWT, getUserDesignsAndFoldersByPath);
 router.post('/shared-with-user', validateJWT, getDesignsSharedWithUser);
 router.post('/public/user/', validateJWT, getPublicDesignsByUser);

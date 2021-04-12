@@ -12,7 +12,10 @@ const DesignSchema = Schema({
     metadata: { type: { 
         name: { type: String, required: true },
         category: { type: Schema.Types.ObjectId, ref: 'Category' },
-        workingTimeDesign: { type: Number },
+        workingTimeDesign: { type: {
+            hours: { type: Number },
+            minutes: { type: Number },
+        } },
         workingTime: { type: {
             hours: { type: Number },
             minutes: { type: Number },
@@ -65,6 +68,7 @@ const DesignSchema = Schema({
         score: { type: Number, required: true },
     }], required: true },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    origin: { type: Schema.Types.ObjectId, ref: 'Design' },
     privileges: { type: [PrivilegeSchema], required: true },
     readOnlyLink: { type: String, required: true },
     keywords: { type: [String], required: true },
