@@ -116,10 +116,11 @@ const socketsConfig = ( io ) => {
             }
         });
 
-        socket.on( 'new-learningActivity', ({ designId }) => {
+        socket.on( 'new-learningActivity', ({ designId, id }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
             const newTla = {
+                id,
                 title: '',
                 description: '',
                 tasks: [],
@@ -152,10 +153,12 @@ const socketsConfig = ( io ) => {
             }
         });
 
-        socket.on( 'new-task', ({ designId, index }) => {
+        socket.on( 'new-task', ({ designId, index, id }) => {
+            console.log(id);
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
             const newTasks = {
+                id,
                 description: '',
                 learningType: '',
                 format: '',

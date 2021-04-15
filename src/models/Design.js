@@ -7,6 +7,37 @@ const PrivilegeSchema = Schema({
     _id : false,
 });
 
+const TaskSchema = Schema({
+    id: { type: Schema.Types.ObjectId, required: true},
+    description: { type: String, required: true },
+    duration: { type: {
+        hours: { type: Number, required: true },
+        minutes: { type: Number, required: true },
+    } },
+    learningType: { type: String, required: true },
+    format: { type: String, required: true },
+    modality: { type: String, required: true },
+    resourseLinks: { type: [{
+        title: { type: String, required: true },
+        link: { type: String, required: true },
+    }] },
+}, {
+    _id : false,
+});
+
+const LearningActivitySchema = Schema({
+    id: { type: Schema.Types.ObjectId, required: true},
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    learningResults: { type: [{
+        verb: { type: String, required: true },
+        description: { type: String, required: true },
+    }], required: true },
+    tasks: { type: [TaskSchema], required: true },
+}, {
+    _id : false,
+});
+
 const DesignSchema = Schema({
     folder: { type: Schema.Types.ObjectId, ref: 'Folder' },
     metadata: { type: { 
@@ -33,28 +64,7 @@ const DesignSchema = Schema({
         }], required: true },
     }, required: true },
     data: { type: {
-        learningActivities: { type: [{
-            title: { type: String, required: true },
-            description: { type: String, required: true },
-            learningResults: { type: [{
-                verb: { type: String, required: true },
-                description: { type: String, required: true },
-            }], required: true },
-            tasks: { type: [{
-                description: { type: String, required: true },
-                duration: { type: {
-                    hours: { type: Number, required: true },
-                    minutes: { type: Number, required: true },
-                } },
-                learningType: { type: String, required: true },
-                format: { type: String, required: true },
-                modality: { type: String, required: true },
-                resourseLinks: { type: [{
-                    title: { type: String, required: true },
-                    link: { type: String, required: true },
-                }] },
-            }], required: true },
-        }], required: true }
+        learningActivities: { type: [LearningActivitySchema], required: true }
     }, required: true },
     comments: { type: [{
         commentary: { type: String, required: true },

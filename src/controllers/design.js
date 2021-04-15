@@ -15,7 +15,7 @@ const getRecentDesigns = async (req, res = response) => {
             .sort({ updatedAt: -1 })
             .limit(5)
             .populate({ path: 'metadata.category', model: Category })
-            .populate('owner', 'name lastname');
+            .populate('owner', 'name lastname img');
         return successResponse('Diseños recientes obtenidos con éxito.', designs, res);
     } catch (error) {
         console.log(error);
@@ -39,7 +39,7 @@ const getUserDesignsAndFoldersByPath = async (req, res = response) => {
             .limit(limit)
             .sort({ updatedAt: -1 })
             .populate({ path: 'metadata.category', model: Category })
-            .populate('owner', 'name lastname')
+            .populate('owner', 'name lastname img')
             .populate('folder', 'owner path parent');
         return successResponse('Diseños obtenidos con éxito.', { ownerId: uid, from: from + limit, nPages : Math.ceil(numOfDesigns / limit),  designs }, res);
     } catch (error) {
@@ -61,7 +61,7 @@ const getDesignsSharedWithUser = async (req, res = response) => {
             .limit(limit)    
             .sort({ updatedAt: -1 })
             .populate({ path: 'metadata.category', model: Category })
-            .populate('owner', 'name lastname');
+            .populate('owner', 'name lastname img');
         return successResponse('Diseños obtenidos con éxito.', { ownerId: uid, from: from + limit, nPages : Math.ceil(numOfDesigns / limit),  designs }, res);
     } catch (error) {
         console.log(error);
@@ -98,7 +98,7 @@ const getPublicDesignsByUser = async (req, res = response) => {
             .skip(from)
             .limit(limit)
             .populate({ path: 'metadata.category', model: Category })
-            .populate('owner', 'name lastname')
+            .populate('owner', 'name lastname img')
             .populate('folder', 'owner path parent');
         return successResponse('Se han obtenido con éxito los diseños públicos del usuario especificado.', { ownerId: id, from: from + limit, nPages : Math.ceil(numOfDesigns / limit), designs }, res);
     } catch (error) {
@@ -208,7 +208,7 @@ const getPublicFilteredDesigns = async (req, res = response) => {
                 'let': {'ownerId': '$owner'}, 
                 'pipeline': [
                     { $match: { "$expr": { "$eq": [ "$_id", "$$ownerId" ] } } },
-                    { $project: { name: 1, lastname: 1, email: 1  }  },
+                    { $project: { name: 1, lastname: 1, email: 1, img: 1  }  },
                 ],
                 'as': 'owner',
             } },
