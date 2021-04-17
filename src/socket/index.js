@@ -167,6 +167,7 @@ const socketsConfig = ( io ) => {
                     hours: 0,
                     minutes: 0,
                 },
+                resourceLinks:[], 
             }
             if(design.data.learningActivities[index].tasks === undefined){
                 design.data.learningActivities[index].tasks = [newTasks]
@@ -179,9 +180,61 @@ const socketsConfig = ( io ) => {
         socket.on( 'delete-task', ({ designId, learningActivityIndex, index })=>{
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.data.learningActivities[learningActivityIndex].tasks.splice( index, 1);
-            return io.to(designId).emit('update-design', designRoom.design);
+            try {
+                design.data.learningActivities[learningActivityIndex].tasks.splice( index, 1);
+                return io.to(designId).emit('update-design', designRoom.design);
+            } catch (error) {
+                console.log(error);
+                return io.to(designId).emit('error', { ok: false, message: 'Error al intentar eliminar su tarea.' });
+            }
+            
         })
+
+        //Socket para agregar recurso colaborativo junto a edit-resource-link-field y delete-resource-link
+        socket.on( 'new-resource-link', ({ designId, learningActivityIndex, index, id}) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            const newLinks = {
+                id,
+                title: '',
+                link: '',
+            }
+            design.data.learningActivities[learningActivityIndex].tasks[index].resourceLinks = [...design.data.learningActivities[learningActivityIndex].tasks[index].resourceLinks, newLinks];
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on('edit-resource-link-field', ({ designId, learningActivityIndex, taskIndex, index, field, value, subfield }) => {
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            try {
+                if(subfield !== null) design.data.learningActivities[learningActivityIndex].tasks[taskIndex].resourceLinks[index][field][subfield] = value;
+                else design.data.learningActivities[learningActivityIndex].tasks[taskIndex].resourceLinks[index][field] = value;
+                return io.to(designId).emit('edit-resource-link-field', { learningActivityIndex, taskIndex, index, field, value, subfield });
+            } catch (error) {
+                console.log(error.message);
+            }
+        });
+
+        socket.on( 'delete-resource-link', ({ designId, learningActivityIndex, taskIndex, index })=>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            design.data.learningActivities[learningActivityIndex].tasks[taskIndex].resourceLinks.splice( index, 1);
+            return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        //Socket para el recurso del modal, no colaborativo en modal
+        socket.on('change-resource-in-task', async({designId, learningActivityIndex, taskIndex, resources}) =>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            const newDesign = await Design.findByIdAndUpdate(designId, {resources}, {new: true});
+            if (newDesign) {
+                design.data.learningActivities[learningActivityIndex].tasks[taskIndex].resourceLinks = resources;
+                //return io.to(designId).emit('change-resource-in-task', resources);
+                return io.to(designId).emit('update-design', designRoom.design);
+            } else {
+                return io.to(designId).emit('error', { ok: false, message: 'Error al intentar registrar el o los recursos.' });
+            }
+        });
 
         socket.on('add-learning-result', ({designId, learningResult}) => {
             let designRoom = designRooms.getDesignRoomById( designId );
