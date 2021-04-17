@@ -36,7 +36,7 @@ const socketsConfig = ( io ) => {
         
         socket.on('join-to-design', async ({ user, designId, public }, callback) => {
             let designRoom = designRooms.getDesignRoomById( designId );
-            let resp = { ok: false, message: 'Ha ocurrido un error, el diseño no existe o usted no tiene privilegios para editar este diseño.'};
+            let resp = { ok: false, message: 'Ha ocurrido un error, el diseño no existe o usted no tiene privilegios para ver o editar este diseño.'};
             if (mongoose.Types.ObjectId.isValid(designId)){
                 const isEditor = await DesignRoom.hasEditor(designId, uid);
                 const isReader = await DesignRoom.hasReader(designId, uid);
@@ -105,12 +105,16 @@ const socketsConfig = ( io ) => {
             }
         });
         
-        socket.on('edit-unit-field', ({ designId, index, field, value }) => {
+        socket.on('edit-unit-field', ({ designId, learningActivityID, field, value }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
             try {
-                design.data.learningActivities[index][field] = value;
-                return io.to(designId).emit('update-design', designRoom.design);
+                design.data.learningActivities.forEach((la, index)=>{
+                    if(la.id === learningActivityID){
+                        design.data.learningActivities[index][field] = value;
+                        return io.to(designId).emit('update-design', designRoom.design);
+                    }
+                });
             } catch (error) {
                 console.log(error.message);
             }
@@ -125,39 +129,40 @@ const socketsConfig = ( io ) => {
                 description: '',
                 tasks: [],
                 learningResults: [],
-            } 
-            if(design.data.learningActivities === undefined){
-                design.data.learningActivities = [newTla]
-                return io.to(designId).emit('update-design', designRoom.design)
-            };
+            }
             design.data.learningActivities = [...design.data.learningActivities, newTla];
             return io.to(designId).emit('update-design', designRoom.design);
         });
 
-        socket.on('delete-learningActivity', ({ designId, index })=>{
+        socket.on('delete-learningActivity', ({ designId, learningActivityID })=>{
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.data.learningActivities.splice( index, 1);
-            return io.to(designId).emit('update-design', designRoom.design);
+            design.data.learningActivities.forEach((la, index)=>{
+                if(la.id === learningActivityID){
+                    design.data.learningActivities.splice( index, 1);
+                    return io.to(designId).emit('update-design', designRoom.design);
+                }
+            });
         });
 
-        socket.on('edit-task-field', ({ designId, learningActivityIndex, index, field, value, subfield }) => {
+        socket.on('edit-task-field', ({ designId, learningActivityID, taskID, field, value, subfield }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
             try {
-                if(subfield !== null) design.data.learningActivities[learningActivityIndex].tasks[index][field][subfield] = value;
-                else design.data.learningActivities[learningActivityIndex].tasks[index][field] = value;
-                return io.to(designId).emit('edit-task-field', { learningActivityIndex, index, field, value, subfield });
+                const l = design.data.learningActivities.find(la => la.id === learningActivityID);
+                const nT = l.tasks.find(t => t.id === taskID);
+                if(subfield !== null) nT[field][subfield] = value;
+                else nT[field] = value;
+                return io.to(designId).emit('edit-task-field', { learningActivityID, taskID, field, value, subfield });
             } catch (error) {
                 console.log(error.message);
             }
         });
 
-        socket.on( 'new-task', ({ designId, index, id }) => {
-            console.log(id);
+        socket.on( 'new-task', ({ designId, learningActivityID, id }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            const newTasks = {
+            const newTask = {
                 id,
                 description: '',
                 learningType: '',
@@ -169,25 +174,23 @@ const socketsConfig = ( io ) => {
                 },
                 resourceLinks:[], 
             }
-            if(design.data.learningActivities[index].tasks === undefined){
-                design.data.learningActivities[index].tasks = [newTasks]
-                return io.to(designId).emit('update-design', designRoom.design)
-            };
-            design.data.learningActivities[index].tasks = [...design.data.learningActivities[index].tasks, newTasks];
-            return io.to(designId).emit('update-design', designRoom.design);
+            design.data.learningActivities.forEach((la, index)=>{
+                if(la.id === learningActivityID){
+                    design.data.learningActivities[index].tasks = [...design.data.learningActivities[index].tasks, newTask];
+                    return io.to(designId).emit('update-design', designRoom.design)
+                }
+            });
         });
-
-        socket.on( 'delete-task', ({ designId, learningActivityIndex, index })=>{
+        // designId: design._id, learningActivityID, taskID: task.id
+        socket.on( 'delete-task', ({ designId, learningActivityID, taskID })=>{
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            try {
-                design.data.learningActivities[learningActivityIndex].tasks.splice( index, 1);
-                return io.to(designId).emit('update-design', designRoom.design);
-            } catch (error) {
-                console.log(error);
-                return io.to(designId).emit('error', { ok: false, message: 'Error al intentar eliminar su tarea.' });
-            }
-            
+            design.data.learningActivities.forEach((la, index) => {
+                if(la.id === learningActivityID){
+                    design.data.learningActivities[index].tasks = design.data.learningActivities[index].tasks.filter((t, i) => t.id !== taskID);
+                }
+            });
+            return io.to(designId).emit('update-design', designRoom.design);
         })
 
         //Socket para agregar recurso colaborativo junto a edit-resource-link-field y delete-resource-link
@@ -229,7 +232,6 @@ const socketsConfig = ( io ) => {
             const newDesign = await Design.findByIdAndUpdate(designId, {resources}, {new: true});
             if (newDesign) {
                 design.data.learningActivities[learningActivityIndex].tasks[taskIndex].resourceLinks = resources;
-                //return io.to(designId).emit('change-resource-in-task', resources);
                 return io.to(designId).emit('update-design', designRoom.design);
             } else {
                 return io.to(designId).emit('error', { ok: false, message: 'Error al intentar registrar el o los recursos.' });
@@ -268,19 +270,29 @@ const socketsConfig = ( io ) => {
             design.metadata.results.splice(index, 1);
             return io.to(designId).emit('update-design', designRoom.design);
         });
-        
-        socket.on('add-learning-result-to-learningActivity', ({designId, index, result}) => {
+        // learningActivityID: learningActivity.id
+        socket.on('add-learning-result-to-learningActivity', ({designId, learningActivityID, result}) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.data.learningActivities[index].learningResults = [...design.data.learningActivities[index].learningResults, result];
-            return io.to(designId).emit('update-design', designRoom.design);
+            design.data.learningActivities.forEach((la, index) => {
+                if(la.id === learningActivityID){
+                    design.data.learningActivities[index].learningResults = [...design.data.learningActivities[index].learningResults, result];
+                    return io.to(designId).emit('update-design', designRoom.design);
+                }
+            });
         });
 
-        socket.on('delete-learning-result-from-learningActivity', ({designId, index, indexLearningResults}) => {
+        socket.on('delete-learning-result-from-learningActivity', ({designId, learningActivityID, indexLearningResults}) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.data.learningActivities[index].learningResults.splice(indexLearningResults, 1);
-            return io.to(designId).emit('update-design', designRoom.design);
+
+            design.data.learningActivities.forEach((la, index) => {
+                if(la.id === learningActivityID){
+                    design.data.learningActivities[index].learningResults.splice(indexLearningResults, 1);
+                    return io.to(designId).emit('update-design', designRoom.design);
+                }
+            });
+
         });
 
         socket.on('change-design-privileges', async({designId, privileges}) =>{
