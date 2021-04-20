@@ -145,6 +145,13 @@ const createDesign = async (req, res = response) => {
                     hours: 0,
                     minutes: 0,
                 },
+                workingTimeDesign: {
+                    hours: 0,
+                    minutes: 0,
+                },
+                priorKnowledge: '',
+                description: '',
+                objetive: '',
                 classSize: 0,
             },
             data: {

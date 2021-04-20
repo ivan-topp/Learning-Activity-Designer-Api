@@ -42,20 +42,19 @@ const DesignSchema = Schema({
     folder: { type: Schema.Types.ObjectId, ref: 'Folder' },
     metadata: { type: { 
         name: { type: String, required: true },
-        category: { type: Schema.Types.ObjectId, ref: 'Category' },
+        category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
         workingTimeDesign: { type: {
             hours: { type: Number },
             minutes: { type: Number },
-        } },
+        }, required: true },
         workingTime: { type: {
             hours: { type: Number },
             minutes: { type: Number },
-        } },
-        classSize: { type: Number },
-        priorKnowledge: { type: String },
-        description: { type: String },
-        objetive: { type: String },
-        public: { type: Boolean, required: true },
+        }, required: true },
+        classSize: { type: Number, required: true },
+        priorKnowledge: { type: String, required: true },
+        description: { type: String, required: true },
+        objetive: { type: String, required: true },
         isPublic: { type: Boolean, required: true },
         scoreMean: { type: Number, required: true },
         results: { type: [{
