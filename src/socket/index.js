@@ -263,18 +263,17 @@ const socketsConfig = ( io ) => {
         socket.on('add-learning-result-to-learningActivity', ({designId, learningActivityID, result}) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-            design.data.learningActivities.forEach((la, index) => {
+            for (const [index, la] of design.data.learningActivities.entries()) {
                 if(la.id === learningActivityID){
                     design.data.learningActivities[index].learningResults = [...design.data.learningActivities[index].learningResults, result];
                     return io.to(designId).emit('update-design', designRoom.design);
                 }
-            });
+            }
         });
 
         socket.on('delete-learning-result-from-learningActivity', ({designId, learningActivityID, indexLearningResults}) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
-
             design.data.learningActivities.forEach((la, index) => {
                 if(la.id === learningActivityID){
                     design.data.learningActivities[index].learningResults.splice(indexLearningResults, 1);
