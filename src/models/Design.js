@@ -21,6 +21,7 @@ const TaskSchema = Schema({
         title: { type: String, required: true },
         link: { type: String, required: true },
     }] },
+    groupSize:{ type: Number },
 }, {
     _id : false,
 });
@@ -34,6 +35,10 @@ const LearningActivitySchema = Schema({
         description: { type: String, required: true },
     }], required: true },
     tasks: { type: [TaskSchema], required: true },
+     evaluation: { type: {
+        title: { type: String },
+        description: { type: String },
+    } },
 }, {
     _id : false,
 });

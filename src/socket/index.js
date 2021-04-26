@@ -129,9 +129,30 @@ const socketsConfig = ( io ) => {
                 description: '',
                 tasks: [],
                 learningResults: [],
+                evaluation: {
+                    title: '',
+                    description: ''
+                }
             }
             design.data.learningActivities = [...design.data.learningActivities, newTla];
             return io.to(designId).emit('update-design', designRoom.design);
+        });
+
+        socket.on('add-evaluation-in-activity', async({designId, learningActivityID, evaluation}) =>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            
+            const newDesign = await Design.findByIdAndUpdate(designId, {evaluation}, {new: true});
+            if (newDesign) {
+                design.data.learningActivities.forEach((la, index)=>{
+                    if(la.id === learningActivityID){
+                        design.data.learningActivities[index].evaluation = evaluation;
+                        return io.to(designId).emit('update-design', designRoom.design);
+                    }
+                });
+            } else {
+                return io.to(designId).emit('error', { ok: false, message: 'Error al intentar registrar el o los recursos.' });
+            }
         });
 
         socket.on('delete-learningActivity', ({ designId, learningActivityID })=>{
@@ -172,7 +193,8 @@ const socketsConfig = ( io ) => {
                     hours: 0,
                     minutes: 0,
                 },
-                resourceLinks:[], 
+                resourceLinks:[],
+                groupSize: 0, 
             }
             design.data.learningActivities.forEach((la, index)=>{
                 if(la.id === learningActivityID){
@@ -193,39 +215,6 @@ const socketsConfig = ( io ) => {
             return io.to(designId).emit('update-design', designRoom.design);
         })
 
-        //Socket para agregar recurso colaborativo junto a edit-resource-link-field y delete-resource-link
-        socket.on( 'new-resource-link', ({ designId, learningActivityIndex, index, id}) => {
-            let designRoom = designRooms.getDesignRoomById( designId );
-            let design = designRoom.design;
-            const newLinks = {
-                id,
-                title: '',
-                link: '',
-            }
-            design.data.learningActivities[learningActivityIndex].tasks[index].resourceLinks = [...design.data.learningActivities[learningActivityIndex].tasks[index].resourceLinks, newLinks];
-            return io.to(designId).emit('update-design', designRoom.design);
-        });
-
-        socket.on('edit-resource-link-field', ({ designId, learningActivityIndex, taskIndex, index, field, value, subfield }) => {
-            let designRoom = designRooms.getDesignRoomById( designId );
-            let design = designRoom.design;
-            try {
-                if(subfield !== null) design.data.learningActivities[learningActivityIndex].tasks[taskIndex].resourceLinks[index][field][subfield] = value;
-                else design.data.learningActivities[learningActivityIndex].tasks[taskIndex].resourceLinks[index][field] = value;
-                return io.to(designId).emit('edit-resource-link-field', { learningActivityIndex, taskIndex, index, field, value, subfield });
-            } catch (error) {
-                console.log(error.message);
-            }
-        });
-
-        socket.on( 'delete-resource-link', ({ designId, learningActivityIndex, taskIndex, index })=>{
-            let designRoom = designRooms.getDesignRoomById( designId );
-            let design = designRoom.design;
-            design.data.learningActivities[learningActivityIndex].tasks[taskIndex].resourceLinks.splice( index, 1);
-            return io.to(designId).emit('update-design', designRoom.design);
-        });
-
-        //Socket para el recurso del modal, no colaborativo en modal
         socket.on('change-resource-in-task', async({designId, learningActivityIndex, taskIndex, resources}) =>{
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
