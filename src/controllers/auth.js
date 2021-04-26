@@ -2,6 +2,7 @@ const { response } = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Folder = require('../models/Folder');
+const mongoose = require('mongoose');
 const { successResponse, badRequest, internalServerError, createdSuccessful } = require('../utils/responses'); 
 const { generateJWT } = require('../utils/jwt');
 
@@ -87,8 +88,28 @@ const renewToken = async (req, res = response) => {
     }
 };
 
+const updatePassword = async (req, res = response) => {
+    const { uid } = req.params;
+    const { newPassword } = req.body;
+    if(!uid) return badRequest('No se ha especificado usuario.', res);
+    if(!mongoose.Types.ObjectId.isValid(uid)) return badRequest('No existe usuario con la id especificada.', res);
+    if(!newPassword) return badRequest('No se ha especificado nueva contraseña.', res);
+    try {
+        let user = await User.findById(uid);
+        if(!user) return badRequest('No existe usuario con la id especificada.', res);
+        const salt = bcrypt.genSaltSync();
+        const newCryptedPassword = bcrypt.hashSync(newPassword, salt);
+        user = await User.findByIdAndUpdate(uid, { password: newCryptedPassword }, { new: true });
+        return successResponse('Contraseña restablecida con éxito', user, res);
+    } catch (error) {
+        console.log(error);
+        internalServerError('Por favor hable con el administrador.', res);
+    }
+};
+
 module.exports = {
     register,
     login,
-    renewToken
+    renewToken,
+    updatePassword,
 };

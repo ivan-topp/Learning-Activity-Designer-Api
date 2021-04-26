@@ -1,8 +1,11 @@
 const {response} = require('express');
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const { sendEmail } = require('../services/email/email');
+const templates = require('../services/email/templates');
 const { badRequest, internalServerError, successResponse } = require('../utils/responses');
 const { caseAndAccentInsensitive } = require('../utils/text');
+const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 const getUser = async(req, res = response)=>{
     const uid = req.params.uid;
@@ -115,10 +118,43 @@ const deleteContact = async(req, res = response) =>{
     }
 };
 
+const getUserByEmail = async (req, res = response) => {
+    const { email } = req.body;
+    if(!email) return badRequest('No se ha especificado dirección de correo electrónico', res);
+    try {
+        const user = await User.findOne({ email });
+        if(!user) return badRequest('No existe usuario con el email ingresado.', res);
+        let randomCode = uuidv4();
+        randomCode = randomCode.substr(randomCode.length - 8).toUpperCase();
+        await sendEmail(user.email, templates.verificationCode(randomCode));
+        return successResponse('Usuario encontrado correctamente', { user, randomCode }, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
+};
+
+const resendVerificationCode = async (req, res = response) => {
+    const { email } = req.body;
+    if(!email) return badRequest('No se ha especificado dirección de correo electrónico', res);
+    try {
+        let randomCode = uuidv4();
+        randomCode = randomCode.substr(randomCode.length - 8).toUpperCase();
+        const emailSent = await sendEmail(email, templates.verificationCode(randomCode));
+        if (!emailSent) return internalServerError('Ha ocurrido un error al intentar reenviar el correo. Por favor, intente de nuevo más tarde', res);
+        return successResponse('Código reenviado con éxito', { randomCode }, res);
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
+};
+
 module.exports = {
     addNewContact,
     deleteContact,
     updateUser,
     getUser,
     searchUsers,
+    getUserByEmail,
+    resendVerificationCode,
 }
