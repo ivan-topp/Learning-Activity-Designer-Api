@@ -194,7 +194,7 @@ const socketsConfig = ( io ) => {
                     minutes: 0,
                 },
                 resourceLinks:[],
-                groupSize: 0, 
+                groupSize: 2, 
             }
             design.data.learningActivities.forEach((la, index)=>{
                 if(la.id === learningActivityID){
