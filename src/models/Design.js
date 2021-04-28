@@ -75,8 +75,6 @@ const DesignSchema = Schema({
         date: { type: Date, required: true },
         user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     }], required: true },
-    likes: { type: Number, default: 0 },
-    dislikes: { type: Number, default: 0 },
     assessments: { type: [{
         user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         score: { type: Number, required: true },

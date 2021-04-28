@@ -296,6 +296,57 @@ const duplicateDesign = async (req, res = response) => {
     }
 };
 
+const importDesign = async (req, res = response) => {
+    const { uid } = req;
+    const { design, path, filename } = req.body;
+    if (!filename) return badRequest('No se ha recibido un archivo.', res);
+    if (!path) return badRequest('No se ha especificado una ruta válida.', res);
+    if (!design) return badRequest('No se ha recibido un diseño de aprendizaje.', res);
+    try {
+        const folder = await Folder.findOne({ owner: uid, path });
+        if(!folder) return badRequest('Error con la carpeta especificada.', res);
+        try {
+            if(
+                !('data' in design) ||
+                !('metadata' in design) ||
+                !('name' in design.metadata) ||
+                !('isPublic' in design.metadata) ||
+                !('scoreMean' in design.metadata) ||
+                !('category' in design.metadata) ||
+                !('results' in design.metadata) ||
+                !('workingTime' in design.metadata) ||
+                !('workingTimeDesign' in design.metadata) ||
+                !('classSize' in design.metadata) ||
+                !('description' in design.metadata) ||
+                !('priorKnowledge' in design.metadata) ||
+                !('objective' in design.metadata) ||
+                !('comments' in design) ||
+                !('assessments' in design) ||
+                !('keywords' in design) ||
+                !('learningActivities' in design.data)
+            ) throw new Error('Invalid data structure');
+            design.owner = mongoose.Types.ObjectId(uid);
+            design.folder = mongoose.Types.ObjectId(folder._id);
+            design.metadata.category = mongoose.Types.ObjectId(design.metadata.category._id);
+            design.metadata.isPublic = false;
+            design.privileges.push({
+                user: mongoose.Types.ObjectId(uid),
+                type: 0,
+            });
+            design.readOnlyLink = uuidv4();
+            const newDesign = new Design(design);
+            await newDesign.save();
+            return successResponse(`Diseño ${design.metadata.name} importado con éxito.`, { newDesign }, res);
+        } catch (e) {
+            console.log(e);
+            return badRequest(`Error al intentar importar el diseño desde el archivo "${filename}". El archivo está corrupto.`, res);
+        }
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Porfavor hable con el administrador.', res);
+    }
+}
+
 module.exports = {
     getRecentDesigns,
     getUserDesignsAndFoldersByPath,
@@ -307,4 +358,5 @@ module.exports = {
     getPublicFilteredDesigns,
     getDesignByLink,
     duplicateDesign,
+    importDesign
 };
