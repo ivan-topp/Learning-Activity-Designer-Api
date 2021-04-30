@@ -23,6 +23,7 @@ const login = async(req, res = response)=>{
                 lastname: user.lastname,
                 occupation: user.occupation,
                 contacts: user.contacts,
+                img: user.img,
             }, 
             token
         }, res);
@@ -60,6 +61,7 @@ const register = async (req, res = response) => {
                 lastname: user.lastname,
                 occupation: user.occupation,
                 contacts: user.contacts,
+                img: user.img,
             }, 
             token
         }, res);
@@ -79,7 +81,9 @@ const renewToken = async (req, res = response) => {
                 uid,
                 name,
                 lastname,
-                contacts: user.contacts
+                occupation: user.occupation,
+                contacts: user.contacts,
+                img: user.img,
             }, 
             token
         }, res);

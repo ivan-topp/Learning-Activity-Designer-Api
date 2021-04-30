@@ -9,6 +9,7 @@ const UserSchema = Schema({
     scoreMean: {type: Number, required: true},
     institution: { type: String },
     country: { type: String },
+    img: { type: String, default: '' },
     city: { type: String },
     description: { type: String },
     contacts: { type: [{type: Schema.Types.ObjectId, ref: 'User'}] },

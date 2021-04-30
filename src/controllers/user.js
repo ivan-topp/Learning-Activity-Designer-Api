@@ -7,6 +7,9 @@ const { badRequest, internalServerError, successResponse } = require('../utils/r
 const { caseAndAccentInsensitive } = require('../utils/text');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
+const fs = require('fs');
+const path = require('path');
+
 const getUser = async(req, res = response)=>{
     const uid = req.params.uid;
     try {
@@ -78,7 +81,6 @@ const updateUser = async( req, res=response ) => {
     const {newData} = req.body;
     try {
         let user = await User.findById( uid );
-        console.log(newData, uid)
         if(!user) return badRequest('El usuario no existe', res);
         if(!newData) return badRequest('Datos nuevos no especificados', res);
         user = await User.findByIdAndUpdate(uid, newData, { rawResult: true });
@@ -149,6 +151,48 @@ const resendVerificationCode = async (req, res = response) => {
     }
 };
 
+//  default options
+
+const updateUserImage = async (req, res) => {
+    const { uid } = req;
+    if (!req.files || Object.keys(req.files).length === 0 || !req.files.img) return badRequest('No se ha especificado ninguna imagen', res);
+    try {
+        const validExtensions = ['jpg', 'jpeg', 'png'];
+        const imgFile = req.files.img;
+        const filename = imgFile.name.split('.');
+        const extension = filename[filename.length - 1];
+        if (!validExtensions.includes(extension)) return badRequest(`Extensión de archivo "${extension}" no válida. Las extensiones permitidas son ` + extensionesValidas.join(', '), res);
+        const newFilename = `${uid}-${new Date().getMilliseconds()}.${extension}`;
+        imgFile.mv(`./public/uploads/users/${ newFilename }`, async (err) => {
+            if (err) {
+                console.log(err);
+                return internalServerError('Error al almacenar la imagen. Porfavor hable con el administrador.', res);
+            }
+        
+            //  Aquí imagen cargada
+            const user = await User.findById(uid);
+            if(!user) {
+                deleteUserImage(newFilename);
+                return badRequest('No existe usuario con el id especificado.', res);
+            }
+            if(user.img.length !== 0) deleteUserImage(user.img);
+            user.img = newFilename;
+            await user.save();
+            return successResponse('Foto de perfil actualizada con éxito.', { user }, res);
+        });    
+    } catch (error) {
+        console.log(error);
+        return internalServerError('Error al cambiar la foto de perfil. Porfavor hable con el administrador.', res);
+    }
+};
+
+const deleteUserImage = (filename) => {
+    const imgPath = path.resolve(__dirname, `../../public/uploads/users/${filename}`);
+    if (fs.existsSync(imgPath)) {
+        fs.unlinkSync(imgPath);
+    }
+};
+
 module.exports = {
     addNewContact,
     deleteContact,
@@ -157,4 +201,5 @@ module.exports = {
     searchUsers,
     getUserByEmail,
     resendVerificationCode,
+    updateUserImage
 }
