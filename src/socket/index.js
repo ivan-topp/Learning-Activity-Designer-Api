@@ -129,10 +129,7 @@ const socketsConfig = ( io ) => {
                 description: '',
                 tasks: [],
                 learningResults: [],
-                evaluation: {
-                    title: '',
-                    description: ''
-                }
+                evaluation: []
             }
             design.data.learningActivities = [...design.data.learningActivities, newTla];
             return io.to(designId).emit('update-design', designRoom.design);
