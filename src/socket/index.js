@@ -163,7 +163,7 @@ const socketsConfig = ( io ) => {
             });
         });
 
-        socket.on('edit-task-field', ({ designId, learningActivityID, taskID, field, value, subfield }) => {
+        socket.on('edit-task-field', ({ designId, learningActivityID, taskID, field, value, subfield, sumHours, sumMinutes }) => {
             let designRoom = designRooms.getDesignRoomById( designId );
             let design = designRoom.design;
             try {
@@ -171,6 +171,27 @@ const socketsConfig = ( io ) => {
                 const nT = l.tasks.find(t => t.id === taskID);
                 if(subfield !== null) nT[field][subfield] = value;
                 else nT[field] = value;
+                if(field === 'duration'){
+                    design.metadata['workingTimeDesign']['hours'] = 0;
+                    let timeDesignMinutesOutOfRange = 0;
+                    design.data.learningActivities.forEach(activity => activity.tasks.forEach((task)=>
+                        sumHours = task.duration.hours + sumHours
+                    ));
+                    design.metadata['workingTimeDesign']['minutes'] = 0
+                    design.data.learningActivities.forEach(activity => activity.tasks.forEach((task)=>{
+                        sumMinutes = task.duration.minutes + sumMinutes
+                        if( sumMinutes > 59){
+                            timeDesignMinutesOutOfRange = sumMinutes - 60
+                            sumHours = sumHours + 1
+                            sumMinutes = timeDesignMinutesOutOfRange
+                        }
+                        }
+                    ));
+                    design.metadata['workingTimeDesign']['minutes'] = design.metadata['workingTimeDesign']['minutes'] + sumMinutes
+                    design.metadata['workingTimeDesign']['hours'] = design.metadata['workingTimeDesign']['hours'] + sumHours
+                    io.to(designId).emit('edit-metadata-field', { field, value, subfield });
+                    io.to(designId).emit('update-design', designRoom.design);
+                }
                 return io.to(designId).emit('edit-task-field', { learningActivityID, taskID, field, value, subfield });
             } catch (error) {
                 console.log(error.message);
