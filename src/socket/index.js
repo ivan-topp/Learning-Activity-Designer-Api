@@ -95,6 +95,7 @@ const socketsConfig = ( io ) => {
             let design = JSON.parse(JSON.stringify(designRoom.design));
             try {
                 design.metadata.category = mongoose.Types.ObjectId(design.metadata.category._id);
+                if(design.origin) delete design.origin;
                 const updatedDesign = await Design.findByIdAndUpdate(design._id, design, {new: true}).populate({ path: 'metadata.category', model: Category });
                 if (!updatedDesign) return io.to(designId).emit('error', { ok: false, message: 'Error al intentar guardar los cambios.' });
                 console.log('diseño guardado con éxito');

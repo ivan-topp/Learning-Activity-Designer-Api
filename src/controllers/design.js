@@ -76,6 +76,7 @@ const deleteDesign = async (req, res = response) => {
     try {
         const design = await Design.findById(id);
         if (design.owner.toString() !== uid) return unauthorized('Usted no está autorizado para eliminar este diseño.', res);
+        await Design.updateMany({ origin: design.id }, { $unset: { origin: 1 } }, { new: true });
         const deleted = await Design.findByIdAndDelete(id);
         return successResponse('Se ha eliminado el diseño con éxito.', deleted, res);
     } catch (error) {
@@ -152,6 +153,7 @@ const createDesign = async (req, res = response) => {
                 priorKnowledge: '',
                 description: '',
                 objetive: '',
+                evaluation: '',
                 classSize: 0,
             },
             data: {
@@ -259,6 +261,13 @@ const duplicateDesign = async (req, res = response) => {
         if(!design) return badRequest('No existe diseño de aprendizaje con la id especificada.', res);
         const folder = await Folder.findOne({ owner: uid, path: '/' });
         if(!folder) return badRequest('Error con la carpeta del diseño especificado.', res);
+        let newData = design.data;
+        newData.learningActivities.forEach((la, index)=>{
+            la.id = mongoose.Types.ObjectId().toString();
+            la.tasks.forEach((task, i) => {
+                task.id = mongoose.Types.ObjectId().toString();
+            });
+        });
         const newDesignJson = {
             folder: folder._id,
             metadata: {
@@ -273,6 +282,7 @@ const duplicateDesign = async (req, res = response) => {
                 description: design.metadata.description,
                 priorKnowledge: design.metadata.priorKnowledge,
                 objective: design.metadata.objective,
+                evaluation: design.metadata.evaluation,
             },
             data: design.data,
             comments: [],
@@ -320,6 +330,7 @@ const importDesign = async (req, res = response) => {
                 !('description' in design.metadata) ||
                 !('priorKnowledge' in design.metadata) ||
                 !('objective' in design.metadata) ||
+                !('evaluation' in design.metadata) ||
                 !('comments' in design) ||
                 !('assessments' in design) ||
                 !('keywords' in design) ||

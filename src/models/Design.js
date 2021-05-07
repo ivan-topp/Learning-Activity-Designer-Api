@@ -66,6 +66,7 @@ const DesignSchema = Schema({
             verb: { type: String, required: true },
             description: { type: String, required: true },
         }], required: true },
+        evaluation: { type: String, required: true },
     }, required: true },
     data: { type: {
         learningActivities: { type: [LearningActivitySchema], required: true }

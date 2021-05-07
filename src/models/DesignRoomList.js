@@ -1,6 +1,7 @@
 const Category = require('./Category');
 const Design = require('./Design');
 const { DesignRoom } = require("./DesignRoom");
+const User = require('./User');
 
 class DesignRoomList {
     constructor() {
@@ -9,7 +10,14 @@ class DesignRoomList {
 
     async addDesignRoom( designId ) {
         try {
-            const design = await Design.findById( designId ).populate({ path: 'metadata.category', model: Category }).populate('privileges.user', 'name lastname email img');
+            const design = await Design.findById( designId )
+                .populate({ path: 'metadata.category', model: Category })
+                .populate('privileges.user', 'name lastname email img')
+                .populate({ path: 'origin', select: 'metadata.name metadata.isPublic owner privileges', 
+                    populate: [
+                        { path: 'owner', model: User, select: 'name lastname img'}, 
+                        { path: 'privileges.user', model: User, select: 'name lastname img'}]
+                    } );
             const newDesignRoom = new DesignRoom( design );
             this.rooms.push(newDesignRoom);
             return newDesignRoom;
