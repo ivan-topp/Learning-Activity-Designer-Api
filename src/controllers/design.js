@@ -242,7 +242,14 @@ const getDesignByLink = async (req, res = response) => {
     if (!link || (link && link.trim().length === 0)) return badRequest('No se ha especificado un enlace.', res);
     try {
         if(!uuidValidate(link)) return badRequest('El enlace no es válido.', res);
-        const design = await Design.findOne({ readOnlyLink: link });
+        const design = await Design.findOne({ readOnlyLink: link })
+            .populate({ path: 'metadata.category', model: Category })
+            .populate('privileges.user', 'name lastname email img')
+            .populate({ path: 'origin', select: 'metadata.name metadata.isPublic owner privileges', 
+                populate: [
+                    { path: 'owner', model: User, select: 'name lastname img'}, 
+                    { path: 'privileges.user', model: User, select: 'name lastname img'}]
+                } );
         if(!design) return badRequest('No se ha encontrado diseño con el enlace especificado.', res);
         return successResponse('Se ha encontrado el diseño con éxito.', { design }, res);
     } catch (error) {
