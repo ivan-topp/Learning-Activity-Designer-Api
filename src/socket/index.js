@@ -378,7 +378,7 @@ const socketsConfig = ( io ) => {
             try {
                 const existentAssesment = design.assessments.find((r, i) => r.user.toString() === rate.user);
                 const index = design.assessments.indexOf(existentAssesment);
-                if(existentAssesment && index !== -1) design.assessments[index] = rate;
+                if(existentAssesment && index !== -1) design.assessments[index].score = rate.score;
                 else design.assessments.push(rate);
                 let sum = 0;
                 design.assessments.forEach((r) => sum += r.score);
