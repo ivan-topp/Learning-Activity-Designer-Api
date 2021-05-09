@@ -13,6 +13,7 @@ class DesignRoomList {
             const design = await Design.findById( designId )
                 .populate({ path: 'metadata.category', model: Category })
                 .populate('privileges.user', 'name lastname email img')
+                .populate('comments.user', 'name lastname email img')
                 .populate({ path: 'origin', select: 'metadata.name metadata.isPublic owner privileges', 
                     populate: [
                         { path: 'owner', model: User, select: 'name lastname img'}, 

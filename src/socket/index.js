@@ -397,6 +397,37 @@ const socketsConfig = ( io ) => {
                 return io.to(designId).emit('error', { ok: false, message: 'Error al registrar o cambiar valoración.' });
             }
         });
+
+        socket.on('comment-design', async({ designId, commentary }) =>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            try {
+                if (!commentary._id) design.comments.push(commentary);
+                else {
+                    const existentCommentary = design.comments.find(c => c._id.toString() === commentary._id.toString());
+                    const index = design.comments.indexOf(existentCommentary);
+                    design.comments[index].commentary = commentary.commentary;
+                }
+                await Design.findByIdAndUpdate(designId, { comments: design.comments });
+                return io.to(designId).emit('comment-design', commentary._id ? commentary : design.comments[design.comments.length - 1]);
+            } catch (error) {
+                console.log(error);
+                return io.to(designId).emit('error', { ok: false, message: 'Error al registrar o editar el comentario.' });
+            }
+        });
+
+        socket.on('delete-comment', async({ designId, commentaryId }) =>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            try {
+                design.comments = design.comments.filter(c => c._id.toString() !== commentaryId.toString());
+                await Design.findByIdAndUpdate(designId, { comments: design.comments });
+                return io.to(designId).emit('delete-comment', commentaryId);
+            } catch (error) {
+                console.log(error);
+                return io.to(designId).emit('error', { ok: false, message: 'Error al registrar o editar el comentario.' });
+            }
+        });
     });
 };
 
