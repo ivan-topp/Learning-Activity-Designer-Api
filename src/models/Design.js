@@ -7,6 +7,13 @@ const PrivilegeSchema = Schema({
     _id : false,
 });
 
+const AssessmentSchema = Schema({
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    score: { type: Number, required: true },
+},{
+    _id : false,
+});
+
 const TaskSchema = Schema({
     id: { type: Schema.Types.ObjectId, required: true},
     description: { type: String, required: true },
@@ -76,10 +83,7 @@ const DesignSchema = Schema({
         date: { type: Date, required: true },
         user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     }], required: true },
-    assessments: { type: [{
-        user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-        score: { type: Number, required: true },
-    }], required: true },
+    assessments: { type: [AssessmentSchema], required: true },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     origin: { type: Schema.Types.ObjectId, ref: 'Design' },
     privileges: { type: [PrivilegeSchema], required: true },

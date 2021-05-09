@@ -5,6 +5,7 @@ const { DesignRoom } = require("../models/DesignRoom");
 const { DesignRoomList } = require("../models/DesignRoomList");
 const { verifyJWT } = require("../utils/jwt");
 const { v4: uuidv4, } = require('uuid');
+const User = require("../models/User");
 
 
 const socketsConfig = ( io ) => {
@@ -368,6 +369,32 @@ const socketsConfig = ( io ) => {
             } catch (error) {
                 console.log(error);
                 return io.to(designId).emit('error', { ok: false, message: 'Error al generar el nuevo enlace.' });
+            }
+        });
+
+        socket.on('rate-design', async({ designId, rate }) =>{
+            let designRoom = designRooms.getDesignRoomById( designId );
+            let design = designRoom.design;
+            try {
+                const existentAssesment = design.assessments.find((r, i) => r.user.toString() === rate.user);
+                const index = design.assessments.indexOf(existentAssesment);
+                if(existentAssesment && index !== -1) design.assessments[index] = rate;
+                else design.assessments.push(rate);
+                let sum = 0;
+                design.assessments.forEach((r) => sum += r.score);
+                const mean = sum / design.assessments.length;
+                design.metadata.scoreMean = mean;
+                await Design.findByIdAndUpdate(designId, { 'metadata.scoreMean': design.metadata.scoreMean, assessments: design.assessments });
+                const designs = await Design.find({ owner: design.owner});
+                let userScoreSum = 0;
+                designs.forEach(d => userScoreSum += d.metadata.scoreMean);
+                let userScoreMean = userScoreSum / designs.length;
+                userScoreMean = Math.round((userScoreMean + Number.EPSILON) * 10) / 10;
+                await User.findByIdAndUpdate(design.owner, { scoreMean: userScoreMean });
+                return io.to(designId).emit('update-design-rate', { assessments: design.assessments, mean });
+            } catch (error) {
+                console.log(error);
+                return io.to(designId).emit('error', { ok: false, message: 'Error al registrar o cambiar valoración.' });
             }
         });
     });
