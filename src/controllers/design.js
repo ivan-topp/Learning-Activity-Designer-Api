@@ -154,6 +154,7 @@ const createDesign = async (req, res = response) => {
                 description: '',
                 objetive: '',
                 evaluation: '',
+                evaluationPattern: '',
                 classSize: 0,
             },
             data: {
@@ -291,6 +292,7 @@ const duplicateDesign = async (req, res = response) => {
                 priorKnowledge: design.metadata.priorKnowledge,
                 objective: design.metadata.objective,
                 evaluation: design.metadata.evaluation,
+                evaluationPattern: design.metadata.evaluationPattern,
             },
             data: design.data,
             comments: [],
@@ -339,6 +341,7 @@ const importDesign = async (req, res = response) => {
                 !('priorKnowledge' in design.metadata) ||
                 !('objective' in design.metadata) ||
                 !('evaluation' in design.metadata) ||
+                !('evaluationPattern' in design.metadata) ||
                 !('comments' in design) ||
                 !('assessments' in design) ||
                 !('keywords' in design) ||

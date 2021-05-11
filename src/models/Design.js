@@ -42,7 +42,7 @@ const LearningActivitySchema = Schema({
         description: { type: String, required: true },
     }], required: true },
     tasks: { type: [TaskSchema], required: true },
-     evaluation: { type: {
+    evaluation: { type: {
         title: { type: String },
         description: { type: String },
     } },
@@ -74,6 +74,7 @@ const DesignSchema = Schema({
             description: { type: String, required: true },
         }], required: true },
         evaluation: { type: String, required: true },
+        evaluationPattern: { type: String, required: true },
     }, required: true },
     data: { type: {
         learningActivities: { type: [LearningActivitySchema], required: true }
