@@ -12,10 +12,9 @@ const UserSchema = Schema({
     img: { type: String, default: '' },
     city: { type: String },
     description: { type: String },
+    color: { type: String, required: true },
     contacts: { type: [{type: Schema.Types.ObjectId, ref: 'User'}] },
-    createdOn: { type: Date, required: true },
-    updatedOn: { type: Date, required: true },
-});
+}, { timestamps: true });
 
 UserSchema.index({
     name: 'text',

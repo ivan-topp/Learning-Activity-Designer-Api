@@ -6,6 +6,18 @@ const mongoose = require('mongoose');
 const { successResponse, badRequest, internalServerError, createdSuccessful } = require('../utils/responses'); 
 const { generateJWT } = require('../utils/jwt');
 
+const colors = [
+    '#30bced',
+    '#6eeb83',
+    '#ffbc42',
+    '#ecd444',
+    '#ee6352',
+    '#9ac2c9',
+    '#8acb88',
+    '#6AC7D1',
+    '#A4A59C',
+];
+
 const login = async(req, res = response)=>{ 
     const {email, password} = req.body;
     if(!email) return badRequest('El correo es requerido.', res);
@@ -24,6 +36,7 @@ const login = async(req, res = response)=>{
                 occupation: user.occupation,
                 contacts: user.contacts,
                 img: user.img,
+                color: user.color,
             }, 
             token
         }, res);
@@ -42,8 +55,7 @@ const register = async (req, res = response) => {
         let user = await User.findOne({ email });
         if(user) return badRequest('Ya existe un usuario con ese correo.', res);
         req.body.scoreMean = 0;
-        req.body.createdOn = Date.now();
-        req.body.updatedOn = Date.now();
+        req.body.color = colors[Math.floor(Math.random() * colors.length)];
         user = new User(req.body);
         const salt = bcrypt.genSaltSync();
         user.password = bcrypt.hashSync(password, salt);
@@ -62,10 +74,12 @@ const register = async (req, res = response) => {
                 occupation: user.occupation,
                 contacts: user.contacts,
                 img: user.img,
+                color: user.color,
             }, 
             token
         }, res);
     } catch (error) {
+        console.log(error);
         internalServerError('Por favor hable con el administrador.', res);
     }
 };
@@ -84,6 +98,7 @@ const renewToken = async (req, res = response) => {
                 occupation: user.occupation,
                 contacts: user.contacts,
                 img: user.img,
+                color: user.color,
             }, 
             token
         }, res);

@@ -47,26 +47,26 @@ const socketsConfig = ( io ) => {
                         if( designRoom ) {
                             socket.join( designId );
                             resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
-                            io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
+                            io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id, privilege: isEditor ? 'Editor' : 'Lector' } ));
                         }
                     } else if (isReader) {
                         designRoom = await designRooms.addDesignRoom( designId );
                         if( designRoom && public) {
                             socket.join( designId );
                             resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
-                            io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
+                            io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id, privilege: isEditor ? 'Editor' : 'Lector' } ));
                         }
                     }
                 } else {
                     if(isEditor){
                         socket.join( designId );
                         resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
-                        io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
+                        io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id, privilege: isEditor ? 'Editor' : 'Lector' } ));
                     } else if (isReader) {
                         if( public) {
                             socket.join( designId );
                             resp = { ok: true, message: 'Usuario ingresado a la sala con éxito.', data: { design: designRoom.design }};
-                            io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id} ));
+                            io.to(designId).emit('users', designRoom.addUser( {...user, socketId: socket.id, privilege: isEditor ? 'Editor' : 'Lector' } ));
                         }
                     }
                 }
