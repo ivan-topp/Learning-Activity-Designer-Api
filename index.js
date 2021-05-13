@@ -33,9 +33,9 @@ wss.on('connection', setupWSConnection);
 
 yWebSocketServer.on('upgrade', (request, socket, head) => {
   // You may check auth of request here..
-  /**
-   * @param {any} ws
-   */
+
+  // @param {any} ws
+  
   const handleAuth = ws => {
     wss.emit('connection', ws, request);
   };
