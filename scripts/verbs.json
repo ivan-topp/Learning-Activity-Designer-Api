@@ -1,138 +1,35 @@
-[{
-    "category": "Recordar",
-    "verb": "Elegir"
-},
+[
 {
     "category": "Recordar",
-    "verb": "observar"
+    "verb": "Describir"
 },
 {
     "category": "Recordar",
-    "verb": "mostrar"
+    "verb": "Encontrar"
 },
 {
     "category": "Recordar",
-    "verb": "Copiar"
+    "verb": "Identificar"
 },
 {
     "category": "Recordar",
-    "verb": "omitir"
+    "verb": "Listar"
 },
 {
     "category": "Recordar",
-    "verb": "deletrear"
+    "verb": "Localizar"
 },
 {
     "category": "Recordar",
-    "verb": "Definir"
+    "verb": "Nombrar"
 },
 {
     "category": "Recordar",
-    "verb": "rastrear"
+    "verb": "Reconocer"
 },
 {
     "category": "Recordar",
-    "verb": "afirmar"
-},
-{
-    "category": "Recordar",
-    "verb": "Decir"
-},
-{
-    "category": "Recordar",
-    "verb": "cuándo"
-},
-{
-    "category": "Recordar",
-    "verb": "duplicar"
-},
-{
-    "category": "Recordar",
-    "verb": "Citar"
-},
-{
-    "category": "Recordar",
-    "verb": "repetir"
-},
-{
-    "category": "Recordar",
-    "verb": "qué"
-},
-{
-    "category": "Recordar",
-    "verb": "leer"
-},
-{
-    "category": "Recordar",
-    "verb": "relacionar"
-},
-{
-    "category": "Recordar",
-    "verb": "nombrar"
-},
-{
-    "category": "Recordar",
-    "verb": "Quién"
-},
-{
-    "category": "Recordar",
-    "verb": "listar"
-},
-{
-    "category": "Recordar",
-    "verb": "repetir"
-},
-{
-    "category": "Recordar",
-    "verb": "Recitar"
-},
-{
-    "category": "Recordar",
-    "verb": "escribir"
-},
-{
-    "category": "Recordar",
-    "verb": "localizar"
-},
-{
-    "category": "Recordar",
-    "verb": "Cómo"
-},
-{
-    "category": "Recordar",
-    "verb": "dónde"
-},
-{
-    "category": "Recordar",
-    "verb": "Memorizar"
-},
-{
-    "category": "Recordar",
-    "verb": "Por"
-},
-{
-    "category": "Recordar",
-    "verb": "qué"
-},
-{
-    "category": "Recordar",
-    "verb": "reconocer"
-},
-{
-    "category": "Comprender",
-    "verb": "Preguntar"
-},
-{
-    "category": "Comprender",
-    "verb": "esquematizar"
-},
-{
-    "category": "Comprender",
-    "verb": "Generalizar"
-},
-{
-    "category": "Comprender",
-    "verb": "predecir"
+    "verb": "Recuperar"
 },
 {
     "category": "Comprender",
@@ -140,55 +37,11 @@
 },
 {
     "category": "Comprender",
-    "verb": "dar ejemplos"
-},
-{
-    "category": "Comprender",
     "verb": "Comparar"
 },
 {
     "category": "Comprender",
-    "verb": "relacionar"
-},
-{
-    "category": "Comprender",
-    "verb": "Contrastar"
-},
-{
-    "category": "Comprender",
-    "verb": "ilustrar"
-},
-{
-    "category": "Comprender",
-    "verb": "Parafrasear"
-},
-{
-    "category": "Comprender",
-    "verb": "demostrar"
-},
-{
-    "category": "Comprender",
-    "verb": "Informar"
-},
-{
-    "category": "Comprender",
-    "verb": "discutir"
-},
-{
-    "category": "Comprender",
-    "verb": "Inferir"
-},
-{
-    "category": "Comprender",
-    "verb": "revisar"
-},
-{
-    "category": "Comprender",
-    "verb": "Interpretar"
-},
-{
-    "category": "Comprender",
-    "verb": "mostrar"
+    "verb": "Ejemplificar"
 },
 {
     "category": "Comprender",
@@ -196,79 +49,31 @@
 },
 {
     "category": "Comprender",
-    "verb": "resumir"
+    "verb": "Inferir"
 },
 {
     "category": "Comprender",
-    "verb": "Expresar"
+    "verb": "Interpretar"
 },
 {
     "category": "Comprender",
-    "verb": "observar"
+    "verb": "Parafrasear"
 },
 {
     "category": "Comprender",
-    "verb": "Traducir"
+    "verb": "Resumir"
 },
 {
     "category": "Aplicar",
-    "verb": "Actuar"
+    "verb": "Desempeñar"
 },
 {
     "category": "Aplicar",
-    "verb": "emplear"
+    "verb": "Ejecutar"
 },
 {
     "category": "Aplicar",
-    "verb": "practicar"
-},
-{
-    "category": "Aplicar",
-    "verb": "Identificar"
-},
-{
-    "category": "Aplicar",
-    "verb": "seleccionar"
-},
-{
-    "category": "Aplicar",
-    "verb": "agrupar"
-},
-{
-    "category": "Aplicar",
-    "verb": "Calcular"
-},
-{
-    "category": "Aplicar",
-    "verb": "elegir"
-},
-{
-    "category": "Aplicar",
-    "verb": "resumir"
-},
-{
-    "category": "Aplicar",
-    "verb": "Entrevistar"
-},
-{
-    "category": "Aplicar",
-    "verb": "planear"
-},
-{
-    "category": "Aplicar",
-    "verb": "desarrollar"
-},
-{
-    "category": "Aplicar",
-    "verb": "Enseñar"
-},
-{
-    "category": "Aplicar",
-    "verb": "transferir"
-},
-{
-    "category": "Aplicar",
-    "verb": "interpretar"
+    "verb": "Implementar"
 },
 {
     "category": "Aplicar",
@@ -276,307 +81,63 @@
 },
 {
     "category": "Aplicar",
-    "verb": "demostrar"
+    "verb": "Emplear"
 },
 {
     "category": "Aplicar",
-    "verb": "categorizar"
-},
-{
-    "category": "Aplicar",
-    "verb": "Conectar"
-},
-{
-    "category": "Aplicar",
-    "verb": "dramatizar"
-},
-{
-    "category": "Aplicar",
-    "verb": "construir"
-},
-{
-    "category": "Aplicar",
-    "verb": "Planear"
-},
-{
-    "category": "Aplicar",
-    "verb": "manipular"
-},
-{
-    "category": "Aplicar",
-    "verb": "resolver"
-},
-{
-    "category": "Aplicar",
-    "verb": "Simular"
-},
-{
-    "category": "Aplicar",
-    "verb": "seleccionar"
-},
-{
-    "category": "Aplicar",
-    "verb": "unir"
-},
-{
-    "category": "Aplicar",
-    "verb": "Hacer uso"
-},
-{
-    "category": "Aplicar",
-    "verb": "organizar"
+    "verb": "Realizar"
 },
 {
     "category": "Analizar",
-    "verb": "Examinar"
+    "verb": "Atribuir"
 },
 {
     "category": "Analizar",
-    "verb": "priorizar"
+    "verb": "Deconstruir"
 },
 {
     "category": "Analizar",
-    "verb": "encontrar"
+    "verb": "Integrar"
 },
 {
     "category": "Analizar",
-    "verb": "Centrarse"
+    "verb": "Organizar"
 },
 {
     "category": "Analizar",
-    "verb": "agrupar"
+    "verb": "Esquematizar"
 },
 {
     "category": "Analizar",
-    "verb": "asumir"
-},
-{
-    "category": "Analizar",
-    "verb": "Razonar"
-},
-{
-    "category": "Analizar",
-    "verb": "destacar"
-},
-{
-    "category": "Analizar",
-    "verb": "causa-efecto"
-},
-{
-    "category": "Analizar",
-    "verb": "Inferencia"
-},
-{
-    "category": "Analizar",
-    "verb": "separar"
-},
-{
-    "category": "Analizar",
-    "verb": "aislar"
-},
-{
-    "category": "Analizar",
-    "verb": "Comparar"
-},
-{
-    "category": "Analizar",
-    "verb": "distinguir"
-},
-{
-    "category": "Analizar",
-    "verb": "reorganizar"
-},
-{
-    "category": "Analizar",
-    "verb": "Dividir"
-},
-{
-    "category": "Analizar",
-    "verb": "motivar"
-},
-{
-    "category": "Analizar",
-    "verb": "diferenciar"
-},
-{
-    "category": "Analizar",
-    "verb": "Buscar similitudes"
-},
-{
-    "category": "Analizar",
-    "verb": "descomponer"
-},
-{
-    "category": "Analizar",
-    "verb": "Inspeccionar"
-},
-{
-    "category": "Analizar",
-    "verb": "Investigar"
-},
-{
-    "category": "Analizar",
-    "verb": "Simplificar"
-},
-{
-    "category": "Analizar",
-    "verb": "categorizar"
-},
-{
-    "category": "Analizar",
-    "verb": "Preguntar"
-},
-{
-    "category": "Analizar",
-    "verb": "ordenar"
-},
-{
-    "category": "Analizar",
-    "verb": "Elegir"
-},
-{
-    "category": "Analizar",
-    "verb": "poner a prueba"
-},
-{
-    "category": "Analizar",
-    "verb": "Establecer"
-},
-{
-    "category": "Analizar",
-    "verb": "observar"
-},
-{
-    "category": "Analizar",
-    "verb": "Encuestar"
+    "verb": "Estructurar"
 },
 {
     "category": "Evaluar",
-    "verb": "Medir"
+    "verb": "Atribuir"
 },
 {
     "category": "Evaluar",
-    "verb": "opinar"
+    "verb": "Comprobar"
 },
 {
     "category": "Evaluar",
-    "verb": "argumentar"
+    "verb": "Deconstruir"
 },
 {
     "category": "Evaluar",
-    "verb": "Evaluar"
+    "verb": "Integrar"
 },
 {
     "category": "Evaluar",
-    "verb": "premiar"
+    "verb": "Organizar"
 },
 {
     "category": "Evaluar",
-    "verb": "testar"
+    "verb": "Esquematizar"
 },
 {
     "category": "Evaluar",
-    "verb": "Decidir"
-},
-{
-    "category": "Evaluar",
-    "verb": "debatir"
-},
-{
-    "category": "Evaluar",
-    "verb": "convencer"
-},
-{
-    "category": "Evaluar",
-    "verb": "Apoyar"
-},
-{
-    "category": "Evaluar",
-    "verb": "explicar"
-},
-{
-    "category": "Evaluar",
-    "verb": "seleccionar"
-},
-{
-    "category": "Evaluar",
-    "verb": "Defender"
-},
-{
-    "category": "Evaluar",
-    "verb": "comparar"
-},
-{
-    "category": "Evaluar",
-    "verb": "deducir"
-},
-{
-    "category": "Evaluar",
-    "verb": "Justificar"
-},
-{
-    "category": "Evaluar",
-    "verb": "percibir"
-},
-{
-    "category": "Evaluar",
-    "verb": "recomendar"
-},
-{
-    "category": "Evaluar",
-    "verb": "Criticar"
-},
-{
-    "category": "Evaluar",
-    "verb": "probar"
-},
-{
-    "category": "Evaluar",
-    "verb": "estimar"
-},
-{
-    "category": "Evaluar",
-    "verb": "Juzgar"
-},
-{
-    "category": "Evaluar",
-    "verb": "influir"
-},
-{
-    "category": "Evaluar",
-    "verb": "persuadir"
-},
-{
-    "category": "Evaluar",
-    "verb": "Valorar"
-},
-{
-    "category": "Evaluar",
-    "verb": "demostrar"
-},
-{
-    "category": "Crear",
-    "verb": "Adaptar"
-},
-{
-    "category": "Crear",
-    "verb": "estimar"
-},
-{
-    "category": "Crear",
-    "verb": "planear"
-},
-{
-    "category": "Crear",
-    "verb": "Añadir"
-},
-{
-    "category": "Crear",
-    "verb": "experimentar"
-},
-{
-    "category": "Crear",
-    "verb": "testar"
+    "verb": "Estrucutrar"
 },
 {
     "category": "Crear",
@@ -584,118 +145,26 @@
 },
 {
     "category": "Crear",
-    "verb": "extender"
-},
-{
-    "category": "Crear",
-    "verb": "sustituir"
-},
-{
-    "category": "Crear",
-    "verb": "Cambiar"
-},
-{
-    "category": "Crear",
-    "verb": "formular"
-},
-{
-    "category": "Crear",
-    "verb": "reescribir"
-},
-{
-    "category": "Crear",
-    "verb": "Combinar"
-},
-{
-    "category": "Crear",
-    "verb": "hipotetizar"
-},
-{
-    "category": "Crear",
-    "verb": "suponer"
-},
-{
-    "category": "Crear",
-    "verb": "Componer"
-},
-{
-    "category": "Crear",
-    "verb": "innovar"
-},
-{
-    "category": "Crear",
-    "verb": "teorizar"
-},
-{
-    "category": "Crear",
-    "verb": "Compilar"
-},
-{
-    "category": "Crear",
-    "verb": "mejorar"
-},
-{
-    "category": "Crear",
-    "verb": "pensar"
-},
-{
-    "category": "Crear",
-    "verb": "Componer"
-},
-{
-    "category": "Crear",
-    "verb": "maximizar"
-},
-{
-    "category": "Crear",
-    "verb": "simplificar"
-},
-{
-    "category": "Crear",
-    "verb": "Crear"
-},
-{
-    "category": "Crear",
-    "verb": "minimizar"
-},
-{
-    "category": "Crear",
-    "verb": "proponer"
-},
-{
-    "category": "Crear",
-    "verb": "Descubir"
-},
-{
-    "category": "Crear",
-    "verb": "modelar"
-},
-{
-    "category": "Crear",
-    "verb": "visualizar"
-},
-{
-    "category": "Crear",
     "verb": "Diseñar"
 },
 {
     "category": "Crear",
-    "verb": "modificar"
+    "verb": "Trazar"
 },
 {
     "category": "Crear",
-    "verb": "Desarrollar"
+    "verb": "Idear"
 },
 {
     "category": "Crear",
-    "verb": "originar"
+    "verb": "Planificar"
 },
 {
     "category": "Crear",
-    "verb": "Elaborar"
+    "verb": "Producir"
 },
 {
     "category": "Crear",
-    "verb": "transformar"
+    "verb": "Hacer"
 }
 ]

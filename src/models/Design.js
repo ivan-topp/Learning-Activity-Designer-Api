@@ -38,14 +38,18 @@ const LearningActivitySchema = Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
     learningResults: { type: [{
+        category: { type: {
+            _id: { type: String, required: true},
+            name: { type: String, required: true},
+        }, required: true },
         verb: { type: String, required: true },
         description: { type: String, required: true },
     }], required: true },
     tasks: { type: [TaskSchema], required: true },
-    evaluation: { type: {
-        title: { type: String },
-        description: { type: String },
-    } },
+    evaluation: { type: [{
+        type: { type: String, required: true },
+        description: { type: String, required: true },
+    }] },
 }, {
     _id : false,
 });
@@ -70,6 +74,10 @@ const DesignSchema = Schema({
         isPublic: { type: Boolean, required: true },
         scoreMean: { type: Number, required: true },
         results: { type: [{
+            category: { type: {
+                    _id: { type: String, required: true},
+                    name: { type: String, required: true},
+            }, required: true},
             verb: { type: String, required: true },
             description: { type: String, required: true },
         }], required: true },

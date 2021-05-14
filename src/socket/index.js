@@ -335,12 +335,14 @@ const socketsConfig = ( io ) => {
                 const targetLearningResult = design.metadata.results[index];
                 design.data.learningActivities.forEach(learningActivity => {
                     learningActivity.learningResults.forEach((lr, i)=>{
-                        if(lr.verb === targetLearningResult.verb && lr.description === targetLearningResult.description) learningActivity.learningResults.splice(i, 1);
+                        if(lr.verb === targetLearningResult.verb && lr.description === targetLearningResult.description) {
+                            learningActivity.learningResults.splice(i, 1);
+                        }
                     });
                 });
                 design.metadata.results.splice(index, 1);
                 io.to(designId).emit('update-design', designRoom.design);
-                return callback({ ok: false, message: 'Resultado de aprendizaje eliminado con éxito.' });
+                return callback({ ok: true, message: 'Resultado de aprendizaje eliminado con éxito.' });
             } catch (error) {
                 return callback({ ok: false, message: 'Error al eliminar el resultado de aprendizaje.' });
             }
