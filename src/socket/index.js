@@ -90,14 +90,20 @@ const socketsConfig = ( io ) => {
 
         socket.on('edit-metadata-field', ({ designId, field, value, subfield=null }, callback) => {
             let resp = subfield 
-                ? { ok: false, message: `Error al intenar editar el campo "${subfield}" del campo "${field}".`}
-                : { ok: false, message: `Error al intenar editar el campo "${field}".`};
+            ? { ok: false, message: `Error al intenar editar el campo "${subfield}" del campo "${field}".`}
+            : { ok: false, message: `Error al intenar editar el campo "${field}".`};
             try {
                 let designRoom = designRooms.getDesignRoomById( designId );
                 let design = designRoom.design;
-                if (subfield !== null) design.metadata[field][subfield] = value;
-                else design.metadata[field] = value;
-                io.to(designId).emit('edit-metadata-field', { field, value, subfield });
+                if (subfield !== null) {
+                    if(design.metadata[field][subfield] !== value){
+                        design.metadata[field][subfield] = value;
+                        io.to(designId).emit('edit-metadata-field', { field, value, subfield });
+                    }
+                } else if (design.metadata[field] !== value) {
+                    design.metadata[field] = value;
+                    io.to(designId).emit('edit-metadata-field', { field, value, subfield });
+                }
                 return callback({ ok: true, message: 'Campo editado con exito.'});
             } catch (error) {
                 return callback(resp);
@@ -129,8 +135,10 @@ const socketsConfig = ( io ) => {
                 let design = designRoom.design;
                 design.data.learningActivities.forEach((la, index)=>{
                     if(la.id === learningActivityID){
-                        design.data.learningActivities[index][field] = value;
-                        io.to(designId).emit('update-design', designRoom.design);
+                        if (design.data.learningActivities[index][field] !== value) {
+                            design.data.learningActivities[index][field] = value;
+                            io.to(designId).emit('update-design', designRoom.design);
+                        }
                         return callback({ ok: true, message: `El campo "${field}" de la actividad ha sido editado con éxito.` });
                     }
                 });
