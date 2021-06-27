@@ -128,6 +128,45 @@ const socketsConfig = ( io ) => {
                 return callback(resp);
             }
         });
+
+        socket.on('reorder-activities', ({ designId, newOrder }, callback) => {
+            try {
+                let designRoom = designRooms.getDesignRoomById( designId );
+                let design = designRoom.design;
+                design.data.learningActivities.sort((a, b) => {
+                    if(newOrder.indexOf(a.id) === -1) return 1;
+                    else if(newOrder.indexOf(b.id) === -1) return -1;
+                    else return newOrder.indexOf(a.id) - newOrder.indexOf(b.id);
+                } );
+                io.to(designId).emit('reorder-activities', newOrder);
+                return callback({ ok: true, message: `Actividades ordenadas con éxito.` });
+            } catch (error) {
+                console.log(error.message);
+                return callback({ ok: false, message: 'Error la cambiar el orden de las actividades.' });
+            }
+        });
+
+        socket.on('reorder-tasks', ({ designId, learningActivityId, newOrder }, callback) => {
+            try {
+                let designRoom = designRooms.getDesignRoomById( designId );
+                let design = designRoom.design;
+                design.data.learningActivities.forEach((la, index) => {
+                    if(la.id === learningActivityId){
+                        design.data.learningActivities[index].tasks.sort((a, b) => {
+                            if(newOrder.indexOf(a.id) === -1) return 1;
+                            else if(newOrder.indexOf(b.id) === -1) return -1;
+                            else return newOrder.indexOf(a.id) - newOrder.indexOf(b.id);
+                        } );
+                        io.to(designId).emit('reorder-tasks', {learningActivityId, newOrder});
+                        return callback({ ok: true, message: `Tareas ordenadas con éxito.` });
+                    }
+                });
+                return callback({ ok: false, message: 'Error la cambiar el orden de las tareas.' });
+            } catch (error) {
+                console.log(error.message);
+                return callback({ ok: false, message: 'Error la cambiar el orden de las tareas.' });
+            }
+        });
         
         socket.on('edit-unit-field', ({ designId, learningActivityID, field, value }, callback) => {
             try {
