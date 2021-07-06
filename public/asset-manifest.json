@@ -1,24 +1,32 @@
 {
   "files": {
     "main.css": "/static/css/main.9d0fa39b.chunk.css",
-    "main.js": "/static/js/main.fb3f865f.chunk.js",
-    "main.js.map": "/static/js/main.fb3f865f.chunk.js.map",
+    "main.js": "/static/js/main.4f5c680c.chunk.js",
+    "main.js.map": "/static/js/main.4f5c680c.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.b0973434.js",
     "runtime-main.js.map": "/static/js/runtime-main.b0973434.js.map",
     "static/css/2.905d391b.chunk.css": "/static/css/2.905d391b.chunk.css",
-    "static/js/2.b0cbc9d8.chunk.js": "/static/js/2.b0cbc9d8.chunk.js",
-    "static/js/2.b0cbc9d8.chunk.js.map": "/static/js/2.b0cbc9d8.chunk.js.map",
+    "static/js/2.f0314761.chunk.js": "/static/js/2.f0314761.chunk.js",
+    "static/js/2.f0314761.chunk.js.map": "/static/js/2.f0314761.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.905d391b.chunk.css.map": "/static/css/2.905d391b.chunk.css.map",
     "static/css/main.9d0fa39b.chunk.css.map": "/static/css/main.9d0fa39b.chunk.css.map",
-    "static/js/2.b0cbc9d8.chunk.js.LICENSE.txt": "/static/js/2.b0cbc9d8.chunk.js.LICENSE.txt",
-    "static/media/dx.light.css": "/static/media/dxicons.d8b3a23c.ttf"
+    "static/js/2.f0314761.chunk.js.LICENSE.txt": "/static/js/2.f0314761.chunk.js.LICENSE.txt",
+    "static/media/Design.80faa6c6.png": "/static/media/Design.80faa6c6.png",
+    "static/media/PyramidBloomDark.c7b5a28f.png": "/static/media/PyramidBloomDark.c7b5a28f.png",
+    "static/media/PyramidBloomLight.0d61d6f5.png": "/static/media/PyramidBloomLight.0d61d6f5.png",
+    "static/media/collaboration.c5d6c932.svg": "/static/media/collaboration.c5d6c932.svg",
+    "static/media/conversational_framework.a67c317d.svg": "/static/media/conversational_framework.a67c317d.svg",
+    "static/media/dx.light.css": "/static/media/dxicons.d8b3a23c.ttf",
+    "static/media/evaluation.5897e540.svg": "/static/media/evaluation.5897e540.svg",
+    "static/media/logo_uct.2382bb18.png": "/static/media/logo_uct.2382bb18.png",
+    "static/media/time_chart.e9724422.svg": "/static/media/time_chart.e9724422.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.b0973434.js",
     "static/css/2.905d391b.chunk.css",
-    "static/js/2.b0cbc9d8.chunk.js",
+    "static/js/2.f0314761.chunk.js",
     "static/css/main.9d0fa39b.chunk.css",
-    "static/js/main.fb3f865f.chunk.js"
+    "static/js/main.4f5c680c.chunk.js"
   ]
 }
