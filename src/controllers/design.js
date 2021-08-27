@@ -7,6 +7,7 @@ const { successResponse, badRequest, internalServerError, createdSuccessful, una
 const mongoose = require('mongoose');
 const { caseAndAccentInsensitive } = require('../utils/text');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
+const designRoomList = require('../models/DesignRoomList');
 
 const getRecentDesigns = async (req, res = response) => {
     const { uid } = req;
@@ -76,8 +77,11 @@ const deleteDesign = async (req, res = response) => {
     try {
         const design = await Design.findById(id);
         if (design.owner.toString() !== uid) return unauthorized('Usted no está autorizado para eliminar este diseño.', res);
+        const designRoom = designRoomList.getDesignRoomById(id);
+        if (!!designRoom && designRoom.getUsers().length > 0) return unauthorized('No es posible eliminar el diseño porque existen usuarios editando su diseño. Por favor intente nuevamente cuando no hayan usuarios editandolo.', res);
         await Design.updateMany({ origin: design.id }, { $unset: { origin: 1 } }, { new: true });
         const deleted = await Design.findByIdAndDelete(id);
+        designRoomList.removeDesignRoom(id);
         return successResponse('Se ha eliminado el diseño con éxito.', deleted, res);
     } catch (error) {
         console.log(error);

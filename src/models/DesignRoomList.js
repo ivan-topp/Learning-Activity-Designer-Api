@@ -43,6 +43,4 @@ class DesignRoomList {
 
 }
 
-module.exports = {
-    DesignRoomList
-}
+module.exports = new DesignRoomList();
