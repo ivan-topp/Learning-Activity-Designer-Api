@@ -2,14 +2,14 @@ const mongoose = require("mongoose");
 const Category = require("../models/Category");
 const Design = require("../models/Design");
 const { DesignRoom } = require("../models/DesignRoom");
-const { DesignRoomList } = require("../models/DesignRoomList");
+const designRooms = require("../models/DesignRoomList");
 const { verifyJWT } = require("../utils/jwt");
 const { v4: uuidv4, } = require('uuid');
 const User = require("../models/User");
 
 
 const socketsConfig = ( io ) => {
-    const designRooms = new DesignRoomList();
+    // const designRooms = DesignRoomList;
     io.on('connection', ( socket ) => {
 
         const [ isValid, uid ] = verifyJWT(socket.handshake.query['x-token']);
@@ -118,7 +118,7 @@ const socketsConfig = ( io ) => {
                 design.metadata.category = mongoose.Types.ObjectId(design.metadata.category._id);
                 if(design.origin) delete design.origin;
                 const updatedDesign = await Design.findByIdAndUpdate(design._id, design, {new: true}).populate({ path: 'metadata.category', model: Category });
-                if (!updatedDesign) return callback(resp);
+                if (!updatedDesign) return callback({ ok: false, message: `Error al intentar guardar los cambios. Probablemente el propietario eliminó este diseño. Si lo deseas puedes respaldar el diseño y/o volver a la pagina principal.`  });
                 resp = { ok: true, message: 'Diseño se ha guardado con éxito.' };
                 console.log('diseño guardado con éxito');
                 io.to(designId).emit('update-design', designRoom.design);
@@ -518,7 +518,7 @@ const socketsConfig = ( io ) => {
                 const mean = sum / design.assessments.length;
                 design.metadata.scoreMean = mean;
                 await Design.findByIdAndUpdate(designId, { 'metadata.scoreMean': design.metadata.scoreMean, assessments: design.assessments });
-                const designs = await Design.find({ owner: design.owner});
+                const designs = await Design.find({ owner: design.owner, 'metadata.scoreMean': { $ne: 0 }});
                 let userScoreSum = 0;
                 designs.forEach(d => userScoreSum += d.metadata.scoreMean);
                 let userScoreMean = userScoreSum / designs.length;

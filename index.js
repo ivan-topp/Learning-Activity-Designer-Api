@@ -1,8 +1,8 @@
+require('dotenv').config();
 require('./src/config/config');
 const http = require('http')
 const app = require('./src/app');
 const socketsConfig = require('./src/socket');
-require('dotenv').config();
 
 const WebSocket = require('ws');
 const setupWSConnection = require('./src/y-websocket-server/utils.js').setupWSConnection;
