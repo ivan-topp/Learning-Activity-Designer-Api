@@ -161,7 +161,7 @@ const updateUserImage = async (req, res) => {
         const imgFile = req.files.img;
         const filename = imgFile.name.split('.');
         const extension = filename[filename.length - 1];
-        if (!validExtensions.includes(extension)) return badRequest(`Extensión de archivo "${extension}" no válida. Las extensiones permitidas son ` + extensionesValidas.join(', '), res);
+        if (!validExtensions.includes(extension)) return badRequest(`Extensión de archivo "${extension}" no válida. Las extensiones permitidas son ` + validExtensions.join(', '), res);
         const newFilename = `${uid}-${new Date().getMilliseconds()}.${extension}`;
         imgFile.mv(`./public/uploads/users/${ newFilename }`, async (err) => {
             if (err) {
