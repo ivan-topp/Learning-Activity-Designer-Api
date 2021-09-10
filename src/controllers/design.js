@@ -343,7 +343,7 @@ const importDesign = async (req, res = response) => {
                 !('classSize' in design.metadata) ||
                 !('description' in design.metadata) ||
                 !('priorKnowledge' in design.metadata) ||
-                !('objective' in design.metadata) ||
+                // !('objetive' in design.metadata) ||
                 !('evaluation' in design.metadata) ||
                 !('evaluationPattern' in design.metadata) ||
                 !('comments' in design) ||
